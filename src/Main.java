@@ -25,8 +25,11 @@ public class Main {
         // Раскрываем эпики на подзадачи
         Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи №1", Status.NEW, epic1.getId());
         taskManager.createSubtask(subtask1);
+        int subtask1_id = subtask1.getId();
+
         Subtask subtask2 = new Subtask("Подзадача 1", "Описание подзадачи №1", Status.NEW, epic2.getId());
         taskManager.createSubtask(subtask2);
+        int subtask2_id = subtask2.getId();
 
 
         System.out.println("Обычные задачи:");
@@ -42,6 +45,27 @@ public class Main {
         System.out.println("Подзадачи:");
         for (Subtask subtask : taskManager.getAllSubtasks()) {
             System.out.println(subtask.getTitle() + ": " + subtask.getStatus());
+        }
+
+        //taskManager.getTaskById(subtask1_id).setStatus(Status.DONE);
+        taskManager.getSubtaskById(subtask1_id).setStatus(Status.DONE);
+
+        System.out.println("Обновленные статусы задач:");
+        for (Task task : taskManager.getAllTasks()) {
+            System.out.println(task.getTitle() + ": " + task.getStatus());
+        }
+
+        //taskManager.deleteTaskById(epic1.getId());
+        taskManager.deleteEpicById(epic1.getId());
+
+        System.out.println("Незакрытые задачи:");
+        for (Task task : taskManager.getAllTasks()) {
+            System.out.println(task.getTitle() + ": " + task.getStatus());
+        }
+
+        System.out.println("Незакрытые эпики:");
+        for (Epic epic : taskManager.getAllEpics()) {
+            System.out.println(epic.getTitle() + ": " + epic.getStatus());
         }
     }
 }
