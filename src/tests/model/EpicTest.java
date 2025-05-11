@@ -1,9 +1,11 @@
-package tests;
+package tests.model;
 
 import model.Epic;
 import model.Status;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import model.Subtask;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import java.util.List;
@@ -61,6 +63,23 @@ class EpicTest {
                 ", subtasks=[1, 2]" +
                 '}';
         assertEquals(expectedString, epic.toString());
+    }
+    @Test
+    void epicAndSubtaskWithSameIdShouldBeEqual() {
+        Epic epic = new Epic("Эпик 1", "Описание первого эпика", Status.NEW);
+        Subtask subtask = new Subtask("Подзадача 1", "Описание подзадачи №1", Status.NEW, epic.getId());
+        epic.setId(2);
+        subtask.setId(2);
+
+        assertEquals(epic, subtask, "Объекты Epic и Subtask с одинаковым ID должны быть равны");
+    }
+
+    @Test
+    void epicShouldNotContainItselfAsSubtask() {
+        Epic epic = new Epic("Эпик 1", "Описание первого эпика", Status.NEW);
+        epic.setId(1);
+
+        assertFalse(epic.getSubtaskIds().contains(1), "Эпик не может содержать сам себя в подзадачах");
     }
 }
 
