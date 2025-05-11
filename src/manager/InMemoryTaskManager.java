@@ -17,12 +17,12 @@ public class InMemoryTaskManager implements TaskManager {
     private int nextId;
     private final HistoryManager historyManager;
 
-    public InMemoryTaskManager(HistoryManager historyManager) {
+    public InMemoryTaskManager() {
         this.tasks = new HashMap<>();
         this.epics = new HashMap<>();
         this.subtasks = new HashMap<>();
         this.nextId = 1;
-        this.historyManager = historyManager;
+        this.historyManager = Manager.getDefaultHistory();
     }
 
     private int generateId() {
