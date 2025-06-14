@@ -1,26 +1,81 @@
 package manager;
 
 import model.Task;
-import java.util.ArrayList;
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private static final int HISTORY_LIMIT = 10;
-    private final ArrayList<Task> history = new ArrayList<>();
+    private static class Node {
+        Task task;
+        Node prev;
+        Node next;
+
+        Node(Task task) {
+            this.task = task;
+        }
+    }
+
+    private Node head;
+    private Node tail;
+    private final Map<Integer, Node> nodeMap = new HashMap<>();
+
+    private void removeNode(Node node) {
+        if (node == null) {
+            return;
+        }
+
+        if (node.prev != null) {
+            node.prev.next = node.next;
+        } else {
+            head = node.next;
+        }
+
+        if (node.next != null) {
+            node.next.prev = node.prev;
+        } else {
+            tail = node.prev;
+        }
+
+    }
 
     @Override
     public void add(Task task) {
         if (task == null) {
             return;
         }
-        if (history.size() == HISTORY_LIMIT) {
-            history.remove(0);
+        Node existingNode = nodeMap.get(task.getId());
+        if (existingNode != null) {
+            removeNode(existingNode);
+            nodeMap.remove(task.getId());
         }
-
-        history.add(task);
+        Node newNode = new Node(task);
+        if (tail == null) {
+            head = newNode;
+            tail = newNode;
+        } else {
+            tail.next = newNode;
+            newNode.prev = tail;
+            tail = newNode;
+        }
+        nodeMap.put(task.getId(), newNode);
     }
 
     @Override
-    public ArrayList<Task> getHistory() {
-        return new ArrayList<>(history);
+    public void remove(int id) {
+        Node node = nodeMap.remove(id);
+        if (node == null) {
+            return;
+        }
+        removeNode(node);
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        List<Task> history = new ArrayList<>();
+        Node current = head;
+        while (current != null) {
+            history.add(current.task);
+            current = current.next;
+        }
+        return history;
     }
 }

@@ -14,7 +14,6 @@ class InMemoryTaskManagerTest {
 
     @BeforeEach
     void setUp() {
-
         taskManager = new InMemoryTaskManager();
     }
 
@@ -49,7 +48,7 @@ class InMemoryTaskManagerTest {
         Task retrievedTask = taskManager.getTaskById(task.getId());
 
         assertEquals("Задача", retrievedTask.getTitle());
-        assertEquals("Описание", retrievedTask.getDescription());
+        assertEquals("Описание задачи", retrievedTask.getDescription());
     }
 
 }
