@@ -72,7 +72,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
-        if (task !=null){
+        if (task != null) {
             historyManager.add(task);
         }
         return task;
@@ -155,7 +155,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
 
     public void deleteSubtaskById(int id) {
-        if(subtasks.containsKey(id)){
+        if (subtasks.containsKey(id)) {
             Subtask subtask = subtasks.get(id);
             subtasks.remove(id);
 
