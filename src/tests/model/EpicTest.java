@@ -28,6 +28,7 @@ class EpicTest {
         assertTrue(subtasks.contains(1));
         assertTrue(subtasks.contains(2));
     }
+
     @Test
     void testRemoveSubtask() {
         epic.addSubtask(1);
@@ -64,6 +65,7 @@ class EpicTest {
                 '}';
         assertEquals(expectedString, epic.toString());
     }
+
     @Test
     void epicAndSubtaskWithSameIdShouldBeEqual() {
         Epic epic = new Epic("Эпик 1", "Описание первого эпика", Status.NEW);
