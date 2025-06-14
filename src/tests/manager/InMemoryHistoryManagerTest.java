@@ -46,6 +46,7 @@ class InMemoryHistoryManagerTest {
         assertEquals("Обновленное описание", history.get(0).getDescription(),
                 "В истории должны сохранятся обновленные задачи");
     }
+
     @Test
     void addAndGetHistory_simple() {
         historyManager.add(t1);
