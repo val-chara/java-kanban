@@ -50,5 +50,4 @@ class InMemoryTaskManagerTest {
         assertEquals("Задача", retrievedTask.getTitle());
         assertEquals("Описание задачи", retrievedTask.getDescription());
     }
-
 }
