@@ -30,11 +30,11 @@ public class Main {
         // Раскрываем эпики на подзадачи
         Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи №1", Status.NEW, epic1.getId());
         taskManager.createSubtask(subtask1);
-        int subtask1_id = subtask1.getId();
+        int subtask1id = subtask1.getId();
 
         Subtask subtask2 = new Subtask("Подзадача 1", "Описание подзадачи №1", Status.NEW, epic2.getId());
         taskManager.createSubtask(subtask2);
-        int subtask2_id = subtask2.getId();
+        int subtask2id = subtask2.getId();
 
 
         System.out.println("Обычные задачи:");
@@ -53,7 +53,7 @@ public class Main {
         }
 
         //taskManager.getTaskById(subtask1_id).setStatus(Status.DONE);
-        taskManager.getSubtaskById(subtask1_id).setStatus(Status.DONE);
+        taskManager.getSubtaskById(subtask1id).setStatus(Status.DONE);
 
         System.out.println("Обновленные статусы задач:");
         for (Task task : taskManager.getAllTasks()) {
@@ -79,7 +79,7 @@ public class Main {
             System.out.println(task.getTitle() + ": " + task.getStatus());
         }
 
-        taskManager.deleteSubtaskById(subtask1_id);
+        taskManager.deleteSubtaskById(subtask1id);
         System.out.println("Подзадачи после удаления одной:");
         for (Subtask subtask : taskManager.getAllSubtasks()) {
             System.out.println(subtask.getTitle() + ": " + subtask.getStatus());
