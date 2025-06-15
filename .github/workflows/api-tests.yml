@@ -6,5 +6,3 @@ on:
 jobs:
   build:
     uses: yandex-praktikum/java-kanban/.github/workflows/api-tests.yml@ci
-    with:
-      test_path: ./src/test
