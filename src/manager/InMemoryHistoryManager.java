@@ -58,7 +58,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         nodeMap.put(task.getId(), newNode);
     }
 
-    private void linkLast (Node node){
+    private void linkLast(Node node) {
             if (tail == null) {
                 head = node;
             } else {
