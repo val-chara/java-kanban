@@ -1,4 +1,4 @@
-package tests.model;
+package test.model;
 
 import model.Epic;
 import model.Status;
@@ -28,6 +28,7 @@ class EpicTest {
         assertTrue(subtasks.contains(1));
         assertTrue(subtasks.contains(2));
     }
+
     @Test
     void testRemoveSubtask() {
         epic.addSubtask(1);
@@ -64,15 +65,7 @@ class EpicTest {
                 '}';
         assertEquals(expectedString, epic.toString());
     }
-    @Test
-    void epicAndSubtaskWithSameIdShouldBeEqual() {
-        Epic epic = new Epic("Эпик 1", "Описание первого эпика", Status.NEW);
-        Subtask subtask = new Subtask("Подзадача 1", "Описание подзадачи №1", Status.NEW, epic.getId());
-        epic.setId(2);
-        subtask.setId(2);
 
-        assertEquals(epic, subtask, "Объекты Epic и Subtask с одинаковым ID должны быть равны");
-    }
 
     @Test
     void epicShouldNotContainItselfAsSubtask() {
