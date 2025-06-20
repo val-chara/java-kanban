@@ -54,18 +54,19 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
 
         Node newNode = new Node(task);
-
-        if (tail == null) {
-            head = newNode;
-            tail = newNode;
-        } else {
-            tail.next = newNode;
-            newNode.prev = tail;
-            tail = newNode;
-        }
-
+        linkLast(newNode);
         nodeMap.put(task.getId(), newNode);
     }
+
+    private void linkLast (Node node){
+            if (tail == null) {
+                head = node;
+            } else {
+                tail.next = node;
+                node.prev = tail;
+            }
+            tail = node;
+        }
 
     @Override
     public void remove(int id) {
