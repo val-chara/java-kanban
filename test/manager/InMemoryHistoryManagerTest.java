@@ -1,4 +1,4 @@
-package test.manager;
+package manager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class InMemoryHistoryManagerTest {
 
     private InMemoryHistoryManager historyManager;
-    private Task task, t1, t2, t3;
+    private Task task;
+    private Task task1;
+    private Task task2;
+    private Task task3;
 
     @BeforeEach
     void setUp() {
@@ -19,12 +22,12 @@ class InMemoryHistoryManagerTest {
         task = new Task("Задача 1", "Описание первой задачи", Status.NEW);
         task.setId(1);
 
-        t1 = new Task("Задача 1", "Описание задачи t1", Status.NEW);
-        t1.setId(1);
-        t2 = new Task("Задача 2", "Описание задачи t2", Status.NEW);
-        t2.setId(2);
-        t3 = new Task("Задача 3", "Описание задачи t3", Status.NEW);
-        t3.setId(3);
+        task1 = new Task("Задача 1", "Описание задачи t1", Status.NEW);
+        task1.setId(1);
+        task2 = new Task("Задача 2", "Описание задачи t2", Status.NEW);
+        task2.setId(2);
+        task3 = new Task("Задача 3", "Описание задачи t3", Status.NEW);
+        task3.setId(3);
     }
 
     @Test
@@ -49,41 +52,41 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void addAndGetHistory_simple() {
-        historyManager.add(t1);
-        historyManager.add(t2);
+        historyManager.add(task1);
+        historyManager.add(task2);
         List<Task> h = historyManager.getHistory();
 
-        assertEquals(List.of(t1, t2), h);
+        assertEquals(List.of(task1, task2), h);
     }
 
     @Test
     void addDuplicate_movesToEnd() {
-        historyManager.add(t1);
-        historyManager.add(t2);
-        historyManager.add(t1); // повтор просмотра t1
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task1); // повтор просмотра t1
 
         List<Task> h = historyManager.getHistory();
-        assertEquals(List.of(t2, t1), h, "t1 должен переместиться в конец");
+        assertEquals(List.of(task2, task1), h, "t1 должен переместиться в конец");
     }
 
     @Test
     void remove_existingNode_removesCorrectly() {
-        historyManager.add(t1);
-        historyManager.add(t2);
-        historyManager.add(t3);
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
 
         historyManager.remove(2);
         List<Task> h = historyManager.getHistory();
 
-        assertEquals(List.of(t1, t3), h);
-        assertFalse(h.contains(t2));
+        assertEquals(List.of(task1, task3), h);
+        assertFalse(h.contains(task2));
     }
 
     @Test
     void remove_nonExisting_doesNothing() {
-        historyManager.add(t1);
+        historyManager.add(task1);
         historyManager.remove(99); // нет задачи с id
-        assertEquals(List.of(t1), historyManager.getHistory());
+        assertEquals(List.of(task1), historyManager.getHistory());
     }
 
     @Test
