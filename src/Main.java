@@ -1,10 +1,15 @@
 import manager.*;
 import model.*;
+import java.io.File;
+
 
 public class Main {
     public static void main(String[] args) {
 
-        TaskManager taskManager = Manager.getDefault();
+        //TaskManager taskManager = Manager.getDefault();
+        File file = new File("tasks.csv");
+        TaskManager taskManager = new FileBackedTaskManager(file);
+
 
         // Создаём обычные задачи
 
