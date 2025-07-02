@@ -7,6 +7,7 @@ import java.util.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
+    private static final String HEADER = "id,type,title,status,description,epic";
 
     public FileBackedTaskManager(File file) {
         this.file = file;
@@ -39,7 +40,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write("id,type,title,status,description,epic");
+            writer.write(HEADER);
             writer.newLine();
             for (Task task : getAllTasks()) {
                 writer.write(toString(task));
