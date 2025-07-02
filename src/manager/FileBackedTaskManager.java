@@ -10,6 +10,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private static final String HEADER = "id,type,title,status,description,epic";
 
     public FileBackedTaskManager(File file) {
+        super();
         this.file = file;
     }
 
@@ -20,18 +21,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
+        int maxId = 0;
+
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line = reader.readLine(); // пропустить заголовок
+            String line = reader.readLine();
+            List<Subtask> subtasksToAddLater = new ArrayList<>();
+
             while ((line = reader.readLine()) != null && !line.isBlank()) {
                 Task task = fromString(line);
-                if (task instanceof Subtask) {
-                    manager.createSubtask((Subtask) task);
-                } else if (task instanceof Epic) {
-                    manager.createEpic((Epic) task);
+                if (task.getType() == TaskType.SUBTASK) {
+                    subtasksToAddLater.add((Subtask) task);
+                } else if (task.getType() == TaskType.EPIC) {
+                    manager.putEpic((Epic) task);
                 } else {
-                    manager.createTask(task);
+                    manager.putTask(task);
+                }
+                if (task.getId() > maxId){
+                    maxId = task.getId();
                 }
             }
+            for (Subtask subtask : subtasksToAddLater) {
+                manager.putSubtask(subtask);
+            }
+            manager.setNextId(maxId + 1);
+
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при загрузке из файла: " + file.getName(), e);
         }
@@ -61,7 +74,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private static String toString(Task task) {
         String epicId = "";
-        if (task instanceof Subtask) {
+        if (task.getType() == TaskType.SUBTASK) {
             epicId = String.valueOf(((Subtask) task).getEpicId());
         }
         return String.format("%d,%s,%s,%s,%s,%s",
