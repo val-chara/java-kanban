@@ -1,10 +1,9 @@
-package tests.manager;
+package manager;
 
 import manager.InMemoryTaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import model.*;
-import manager.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,7 +13,6 @@ class InMemoryTaskManagerTest {
 
     @BeforeEach
     void setUp() {
-
         taskManager = new InMemoryTaskManager();
     }
 
@@ -49,7 +47,6 @@ class InMemoryTaskManagerTest {
         Task retrievedTask = taskManager.getTaskById(task.getId());
 
         assertEquals("Задача", retrievedTask.getTitle());
-        assertEquals("Описание", retrievedTask.getDescription());
+        assertEquals("Описание задачи", retrievedTask.getDescription());
     }
-
 }
