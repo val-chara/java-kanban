@@ -1,7 +1,5 @@
 package manager;
 
-import java.io.File;
-
 public class Manager {
 
     public static TaskManager getDefault() {
