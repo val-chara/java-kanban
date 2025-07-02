@@ -1,6 +1,7 @@
 package manager;
 
 import model.*;
+import manager.ConverterTask;
 
 import java.io.*;
 import java.util.*;
@@ -28,7 +29,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             List<Subtask> subtasksToAddLater = new ArrayList<>();
 
             while ((line = reader.readLine()) != null && !line.isBlank()) {
-                Task task = fromString(line);
+                Task task = ConverterTask.fromString(line);
                 if (task.getType() == TaskType.SUBTASK) {
                     subtasksToAddLater.add((Subtask) task);
                 } else if (task.getType() == TaskType.EPIC) {
@@ -55,63 +56,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write(HEADER);
             writer.newLine();
+
             for (Task task : getAllTasks()) {
-                writer.write(toString(task));
+                writer.write(ConverterTask.taskToString(task));
                 writer.newLine();
             }
             for (Epic epic : getAllEpics()) {
-                writer.write(toString(epic));
+                writer.write(ConverterTask.taskToString(epic));
                 writer.newLine();
             }
             for (Subtask subtask : getAllSubtasks()) {
-                writer.write(toString(subtask));
+                writer.write(ConverterTask.taskToString(subtask));
                 writer.newLine();
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при сохранении в файл: " + file.getName(), e);
         }
-    }
-
-    private static String toString(Task task) {
-        String epicId = "";
-        if (task.getType() == TaskType.SUBTASK) {
-            epicId = String.valueOf(((Subtask) task).getEpicId());
-        }
-        return String.format("%d,%s,%s,%s,%s,%s",
-                task.getId(),
-                task.getType(),
-                task.getTitle(),
-                task.getStatus(),
-                task.getDescription(),
-                epicId
-        );
-    }
-
-    private static Task fromString(String line) {
-        String[] parts = line.split(",", 6);
-        int id = Integer.parseInt(parts[0]);
-        TaskType type = TaskType.valueOf(parts[1]);
-        String title = parts[2];
-        Status status = Status.valueOf(parts[3]);
-        String description = parts[4];
-
-        Task task;
-        switch (type) {
-            case TASK:
-                task = new Task(title, description, status);
-                break;
-            case EPIC:
-                task = new Epic(title, description, status);
-                break;
-            case SUBTASK:
-                int epicId = Integer.parseInt(parts[5]);
-                task = new Subtask(title, description, status, epicId);
-                break;
-            default:
-                throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
-        }
-        task.setId(id);
-        return task;
     }
 
     @Override
