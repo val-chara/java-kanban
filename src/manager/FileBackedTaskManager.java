@@ -15,7 +15,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.file = file;
     }
 
-    public FileBackedTaskManager(){
+    public FileBackedTaskManager() {
         this(new File("default_tasks.csv"));
     }
 
@@ -37,7 +37,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 } else {
                     manager.putTask(task);
                 }
-                if (task.getId() > maxId){
+                if (task.getId() > maxId) {
                     maxId = task.getId();
                 }
             }
