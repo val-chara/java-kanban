@@ -100,10 +100,9 @@ public class Epic extends Task {
         for (int id : subtaskIds) {
             Subtask subtask = inMemoryTaskManager.getSubtaskById(id);
             if (subtask != null && subtask.getDuration() != null) {
-                totalMinutes  += subtask.getDuration().toMinutes();
+                totalMinutes += subtask.getDuration().toMinutes();
             }
         }
         return Duration.ofMinutes(totalMinutes);
     }
-
 }
