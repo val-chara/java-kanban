@@ -21,10 +21,12 @@ class EpicTest {
         epic = new Epic("Эпик ", "Описание эпика", Status.NEW, LocalDateTime.of(2025, 7, 18, 10, 0),
                 Duration.ofMinutes(0));
         epic.setId(100);
+
+        inMemoryTaskManager.createEpic(epic);
     }
 
     private void addSubtaskToManager(Subtask subtask) {
-        inMemoryTaskManager.addSubtask(subtask);
+        inMemoryTaskManager.createSubtask(subtask);
     }
 
     @Test
@@ -87,51 +89,55 @@ class EpicTest {
 
     @Test
     void epicStartTimeShouldBeEarliestOfSubtasks() {
+        Epic epic = inMemoryTaskManager.createEpic(new Epic("Epic", "desc", Status.NEW, null, null));
+
         Subtask sub1 = new Subtask("Подзадача 1", "desc", Status.NEW, epic.getId(),
                 LocalDateTime.of(2025, 7, 18, 9, 0), Duration.ofMinutes(30));
         Subtask sub2 = new Subtask("Подзадача 2", "desc", Status.NEW, epic.getId(),
                 LocalDateTime.of(2025, 7, 18, 11, 0), Duration.ofMinutes(60));
 
-        sub1.setId(1);
-        sub2.setId(2);
+        inMemoryTaskManager.createSubtask(sub1);
+        inMemoryTaskManager.createSubtask(sub2);
 
-        epic.addSubtask(1);
-        epic.addSubtask(2);
+        Epic updatedEpic = inMemoryTaskManager.getEpicById(epic.getId());
 
-        assertEquals(LocalDateTime.of(2025, 7, 18, 9, 0), epic.getStartTime());
+        assertEquals(LocalDateTime.of(2025, 7, 18, 9, 0), updatedEpic.getStartTime());
     }
 
     @Test
     void epicEndTimeShouldBeLatestOfSubtasks() {
+        Epic epic = inMemoryTaskManager.createEpic(new Epic("Epic", "desc", Status.NEW, null, null));
+
         Subtask sub1 = new Subtask("Подзадача 1", "desc", Status.NEW, epic.getId(),
                 LocalDateTime.of(2025, 7, 18, 9, 0), Duration.ofMinutes(30));
         Subtask sub2 = new Subtask("Подзадача 2", "desc", Status.NEW, epic.getId(),
                 LocalDateTime.of(2025, 7, 18, 11, 0), Duration.ofMinutes(90));
 
-        sub1.setId(1);
-        sub2.setId(2);
+        inMemoryTaskManager.createSubtask(sub1);
+        inMemoryTaskManager.createSubtask(sub2);
 
-        epic.addSubtask(1);
-        epic.addSubtask(2);
+        Epic updatedEpic = inMemoryTaskManager.getEpicById(epic.getId());
 
-        assertEquals(LocalDateTime.of(2025, 7, 18, 12, 30), epic.getEndTime());
+        assertEquals(LocalDateTime.of(2025, 7, 18, 12, 30), updatedEpic.getEndTime());
     }
 
     @Test
     void epicDurationShouldBeSumOfSubtaskDurations() {
+        Epic epic = inMemoryTaskManager.createEpic(new Epic("Epic", "desc", Status.NEW, null, null));
+
         Subtask sub1 = new Subtask("Подзадача 1", "desc", Status.NEW, epic.getId(),
                 LocalDateTime.of(2025, 7, 18, 9, 0), Duration.ofMinutes(40));
         Subtask sub2 = new Subtask("Подзадача 2", "desc", Status.NEW, epic.getId(),
                 LocalDateTime.of(2025, 7, 18, 10, 0), Duration.ofMinutes(50));
 
-        sub1.setId(1);
-        sub2.setId(2);
+        inMemoryTaskManager.createSubtask(sub1);
+        inMemoryTaskManager.createSubtask(sub2);
 
-        epic.addSubtask(1);
-        epic.addSubtask(2);
+        Epic updatedEpic = inMemoryTaskManager.getEpicById(epic.getId());
 
-        assertEquals(Duration.ofMinutes(90), epic.getDuration());
+        assertEquals(Duration.ofMinutes(90), updatedEpic.getDuration());
     }
+
 }
 
 
