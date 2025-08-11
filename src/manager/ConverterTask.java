@@ -27,7 +27,7 @@ public class ConverterTask {
             duration = "";
         }
 
-        return String.format("%d,%s,%s,%s,%s,%s",
+        return String.format("%d,%s,%s,%s,%s,%s,%s,%s",
                 task.getId(),
                 task.getType(),
                 task.getTitle(),
