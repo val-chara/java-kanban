@@ -106,5 +106,4 @@ public class Task {
         }
         return startTime.plus(duration);
     }
-
 }
