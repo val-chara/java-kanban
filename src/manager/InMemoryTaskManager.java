@@ -9,19 +9,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
-import java.util.Comparator;
 
 public class InMemoryTaskManager implements TaskManager {
-
-    protected  Map<Integer, Task> tasks;
-    protected  Map<Integer, Epic> epics;
-    protected  Map<Integer, Subtask> subtasks;
-    protected  int nextId;
-    protected final HistoryManager historyManager;
+    private Map<Integer, Task> tasks;
+    private Map<Integer, Epic> epics;
+    private Map<Integer, Subtask> subtasks;
+    private int nextId;
+    private final HistoryManager historyManager;
 
     public InMemoryTaskManager() {
-
         this.tasks = new HashMap<>();
         this.epics = new HashMap<>();
         this.subtasks = new HashMap<>();
@@ -30,7 +26,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private int generateId() {
-
         return nextId++;
     }
 
@@ -61,16 +56,14 @@ public class InMemoryTaskManager implements TaskManager {
         subtask.setId(generateId());
         subtasks.put(subtask.getId(), subtask);
         epic.addSubtask(subtask.getId());
-
         updateEpicStatus(epic.getId());
-
         return subtask;
     }
 
     @Override
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
-        if (task != null) {
+        if (task !=null){
             historyManager.add(task);
         }
         return task;
@@ -105,7 +98,6 @@ public class InMemoryTaskManager implements TaskManager {
         boolean allDone = true;
 
         for (int subtaskId : epic.getSubtaskIds()) {
-
             Subtask subtask = subtasks.get(subtaskId);
             Status status = subtask.getStatus();
 
@@ -133,16 +125,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTaskById(int id) {
         tasks.remove(id);
-        historyManager.remove(id);
-
     }
 
     @Override
     public void deleteEpicById(int id) {
         Epic epic = epics.remove(id);
         if (epic != null) {
-
-            for (int subtaskId : new ArrayList<>(epic.getSubtaskIds())) {
+            for (int subtaskId : new ArrayList<>(epic.getSubtaskIds())){
                 subtasks.remove(subtaskId);
             }
         }
@@ -150,10 +139,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubtaskById(int id) {
-        if (subtasks.containsKey(id)) {
+        if(subtasks.containsKey(id)){
             Subtask subtask = subtasks.get(id);
             subtasks.remove(id);
-
             Epic epic = epics.get(subtask.getEpicId());
                 if (epic != null) {
                     epic.removeSubtask(id);
@@ -171,7 +159,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateEpic(Epic epic) {
-
         if (epics.containsKey(epic.getId())) {
             Epic stored = epics.get(epic.getId());
             stored.setTitle(epic.getTitle());
@@ -201,7 +188,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllSubtasks() {
         subtasks.clear();
-
         for (Epic epic : epics.values()) {
             epic.getSubtaskIds().clear();
             epic.setStatus(Status.NEW);
@@ -212,12 +198,9 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Subtask> getSubtasksOfEpic(int epicId) {
         Epic epic = epics.get(epicId);
         List<Subtask> result = new ArrayList<>();
-
         if (epic != null) {
-
             for (int subtaskId : epic.getSubtaskIds()) {
                 Subtask subtask = subtasks.get(subtaskId);
-
                 if (subtask != null) {
                     result.add(subtask);
                 }
@@ -243,36 +226,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<Task> getHistory() {
-        return new ArrayList<>(historyManager.getHistory());
+        return historyManager.getHistory();
     }
-
-    @Override
-    public List<Task> getPrioritizedTasks() {
-        TreeSet<Task> prioritized = new TreeSet<>(Comparator.comparing(Task::getStartTime));
-        prioritized.addAll(tasks.values().stream().filter(t -> t.getStartTime() != null).toList());
-        prioritized.addAll(subtasks.values().stream().filter(t -> t.getStartTime() != null).toList());
-        return new ArrayList<>(prioritized);
-    }
-
-    protected void putTask(Task task) {
-        tasks.put(task.getId(), task);
-    }
-
-    protected void putEpic(Epic epic) {
-        epics.put(epic.getId(), epic);
-    }
-
-    protected void putSubtask(Subtask subtask) {
-        subtasks.put(subtask.getId(), subtask);
-        Epic epic = epics.get(subtask.getEpicId());
-        if (epic != null) {
-            epic.addSubtask(subtask.getId());
-        }
-    }
-
-    protected void setNextId(int nextId) {
-        this.nextId = nextId;
-    }
-
 }
 

@@ -1,45 +1,28 @@
 package model;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
 public class Subtask extends Task {
-
     private int epicId;
 
-    public Subtask(String title, String description, Status status, int epicId, LocalDateTime startTime, Duration duration) {
-
-        super(title, description, status, startTime, duration);
+    public Subtask(String title, String description, Status status, int epicId) {
+        super(title, description, status);
         this.epicId = epicId;
     }
-
     public int getEpicId() {
         return epicId;
     }
-
     public void setEpicId(int epicId) {
         this.epicId = epicId;
     }
 
     @Override
-
     public String toString() {
-
         return "Subtask{" +
                 "id=" + getId() +
                 ", name='" + getTitle() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", status=" + getStatus() +
                 ", epicId=" + getEpicId() +
-                ", startTime=" + getStartTime() +
-                ", endTime=" + getEndTime() +
-                ", duration=" + getDuration() +
                 '}';
-    }
-
-    @Override
-    public TaskType getType() {
-        return TaskType.SUBTASK;
     }
 
 }
