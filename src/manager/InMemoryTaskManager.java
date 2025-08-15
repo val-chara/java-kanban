@@ -12,10 +12,10 @@ import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private Map<Integer, Task> tasks;
-    private Map<Integer, Epic> epics;
-    private Map<Integer, Subtask> subtasks;
-    private int nextId;
+    protected  Map<Integer, Task> tasks;
+    protected  Map<Integer, Epic> epics;
+    protected  Map<Integer, Subtask> subtasks;
+    protected  int nextId;
     private final HistoryManager historyManager;
 
     public InMemoryTaskManager() {
@@ -138,6 +138,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     public void deleteTaskById(int id) {
         tasks.remove(id);
+        historyManager.remove(id);
+
     }
 
     @Override
@@ -260,6 +262,26 @@ public class InMemoryTaskManager implements TaskManager {
 
     public ArrayList<Task> getHistory() {
         return new ArrayList<>(historyManager.getHistory());
+    }
+
+    protected void putTask(Task task) {
+        tasks.put(task.getId(), task);
+    }
+
+    protected void putEpic(Epic epic) {
+        epics.put(epic.getId(), epic);
+    }
+
+    protected void putSubtask(Subtask subtask) {
+        subtasks.put(subtask.getId(), subtask);
+        Epic epic = epics.get(subtask.getEpicId());
+        if (epic != null) {
+            epic.addSubtask(subtask.getId());
+        }
+    }
+
+    protected void setNextId(int nextId) {
+        this.nextId = nextId;
     }
 }
 
