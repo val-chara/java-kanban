@@ -10,8 +10,17 @@ public class Task {
     protected String description;
     protected int id;
     protected Status status;
-    private final LocalDateTime startTime;
-    private final Duration duration;
+    private LocalDateTime startTime;
+    private Duration duration;
+
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
 
     public Task(String title, String description, Status status, LocalDateTime startTime, Duration duration) {
         this.title = title;
@@ -66,25 +75,27 @@ public class Task {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id && Objects.equals(title, task.title) && Objects.equals(description, task.description)
-                && status == task.status;
+        return id == task.id &&
+                Objects.equals(title, task.title) &&
+                Objects.equals(description, task.description) && status == task.status &&
+                Objects.equals(duration, task.duration) &&
+                Objects.equals(startTime, task.startTime);
     }
 
     @Override
-
     public int hashCode() {
-
-        return Objects.hash(title, description, id, status);
+        return Objects.hash(title, description, id, status, duration, startTime);
     }
 
     @Override
-
     public String toString() {
         return "Task{" +
                 "id = " + id +
                 ", title = " + title +
                 ", description = " + description +
                 ", status = " + status +
+                ", startTime = " + startTime +
+                ", endTime = " + getEndTime() +
                 '}';
     }
 
