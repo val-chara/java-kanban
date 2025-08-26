@@ -20,7 +20,9 @@ class EpicTest {
     @BeforeEach
     void setUp() {
         taskManager = Manager.getDefault();
-        epic = new Epic("Эпик ", "Описание эпика", Status.NEW, LocalDateTime.now(), Duration.ofMinutes(30));
+        epic = new Epic("Эпик ", "Описание эпика", Status.NEW);
+        taskManager.createEpic(epic);
+        Epic.setTaskManager(taskManager);
     }
 
     @Test
@@ -77,7 +79,7 @@ class EpicTest {
 
     @Test
     void epicShouldNotContainItselfAsSubtask() {
-        Epic epic = new Epic("Эпик 1", "Описание первого эпика", Status.NEW, LocalDateTime.now(), Duration.ofMinutes(30));
+        Epic epic = new Epic("Эпик 1", "Описание первого эпика", Status.NEW);
         epic.setId(1);
 
         assertFalse(epic.getSubtaskIds().contains(1), "Эпик не может содержать сам себя в подзадачах");
@@ -88,9 +90,24 @@ class EpicTest {
         assertNull(epic.getEndTime(), "У эпика без подзадач endTime должен быть null");
         assertEquals(Duration.ZERO, epic.getDuration(), "У эпика без подзадач duration должен быть 0");
     }
+    @Test
+    void testEpicDurationCalculation() {
+        Epic epic = new Epic("Test", "Desc", Status.NEW);
+        taskManager.createEpic(epic);
 
+        Subtask subtask1 = new Subtask("Sub1", "Desc", Status.NEW, epic.getId(),
+                LocalDateTime.now(), Duration.ofHours(2));
+        Subtask subtask2 = new Subtask("Sub2", "Desc", Status.NEW, epic.getId(),
+                LocalDateTime.now().plusHours(1), Duration.ofHours(3));
 
+        taskManager.createSubtask(subtask1);
+        taskManager.createSubtask(subtask2);
 
+        epic.addSubtask(subtask1.getId());
+        epic.addSubtask(subtask2.getId());
 
+        Epic.setTaskManager(taskManager);
 
+        assertEquals(Duration.ofHours(5), epic.getDuration());
+    }
 }

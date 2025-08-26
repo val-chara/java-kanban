@@ -178,22 +178,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public Task getTaskById(int id) {
-        Task task = super.getTaskById(id);
-        save();
-        return task;
+        //Task task = super.getTaskById(id);
+        //save();
+        return super.getTaskById(id);
     }
 
     @Override
     public Epic getEpicById(int id) {
-        Epic epic = super.getEpicById(id);
-        save();
-        return epic;
+        //Epic epic = super.getEpicById(id);
+        //save();
+        return super.getEpicById(id);
     }
 
     @Override
     public Subtask getSubtaskById(int id) {
-        Subtask subtask = super.getSubtaskById(id);
-        save();
-        return subtask;
+        //Subtask subtask = super.getSubtaskById(id);
+        //save();
+        return super.getSubtaskById(id);
     }
 }

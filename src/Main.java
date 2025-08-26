@@ -9,12 +9,8 @@ import java.time.Duration;
 public class Main {
     public static void main(String[] args) {
 
-        //TaskManager taskManager = Manager.getDefault();
         File file = new File("tasks.csv");
         TaskManager taskManager = new FileBackedTaskManager(file);
-
-
-        // Создаём обычные задачи
 
         Task task1 = new Task("Задача 1", "Описание первой задачи", Status.NEW, LocalDateTime.of(2025, 7, 18, 10, 0),
                 Duration.ofMinutes(90));
@@ -24,21 +20,19 @@ public class Main {
         Task task2 = new Task("Задача 2", "Описание второй задачи", Status.IN_PROGRESS, LocalDateTime.of(2025, 7, 18, 12, 0),
                 Duration.ofMinutes(45));
         taskManager.createTask(task2);
-        int task2Id = task1.getId();
+        int task2Id = task2.getId();
 
         Task task3 = new Task("Задача 3", "Описание третьей задачи", Status.DONE, LocalDateTime.of(2025, 7, 18, 14, 30),
                 Duration.ofMinutes(60));
         taskManager.createTask(task3);
-        int task3Id = task1.getId();
+        int task3Id = task3.getId();
 
-        // Создаём эпики
-        Epic epic1 = new Epic("Эпик 1", "Описание первого эпика", Status.NEW, null, null);
+        Epic epic1 = new Epic("Эпик 1", "Описание первого эпика", Status.NEW);
         taskManager.createEpic(epic1);
 
-        Epic epic2 = new Epic("Эпик 2", "Описание второго эпика", Status.NEW, null, null);
+        Epic epic2 = new Epic("Эпик 2", "Описание второго эпика", Status.NEW);
         taskManager.createEpic(epic2);
 
-        // Раскрываем эпики на подзадачи
         Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи №1", Status.NEW, epic1.getId(), LocalDateTime.of(2025, 7, 20, 10, 0),
                 Duration.ofMinutes(60));
         taskManager.createSubtask(subtask1);
@@ -48,7 +42,6 @@ public class Main {
                 Duration.ofMinutes(45));
         taskManager.createSubtask(subtask2);
         int subtask2id = subtask2.getId();
-
 
         System.out.println("Обычные задачи:");
         for (Task task : taskManager.getAllTasks()) {

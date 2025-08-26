@@ -15,7 +15,7 @@ class SubtaskTest {
 
     @Test
     void subtaskShouldNotBeItsOwnEpic() {
-        Epic epic = new Epic("Эпик 2", "Описание второго эпика", Status.NEW, LocalDateTime.of(2025, 7, 18, 10, 0), Duration.ofMinutes(90));
+        Epic epic = new Epic("Эпик 2", "Описание второго эпика", Status.NEW);
         Subtask subtask = new Subtask("Подзадача 2", "Описание подзадачи №2", Status.NEW, epic.getId(), LocalDateTime.of(2025, 7, 19, 11, 0), Duration.ofMinutes(90));
         subtask.setId(2);
 
