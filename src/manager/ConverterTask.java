@@ -6,25 +6,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ConverterTask {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
     public static String taskToString(Task task) {
         String epicId = "";
         if (task.getType() == TaskType.SUBTASK) {
             epicId = String.valueOf(((Subtask) task).getEpicId());
         }
-        String startTime;
+        String startTime = "";
         if (task.getStartTime() != null) {
-            startTime = task.getStartTime().toString();
-        } else {
-            startTime = "";
+            startTime = task.getStartTime().format(formatter);
         }
 
-        String duration;
+        String duration = "";
         if (task.getDuration() != null) {
             duration = String.valueOf(task.getDuration().toMinutes());
-        } else {
-            duration = "";
         }
 
         return String.format("%d,%s,%s,%s,%s,%s,%s,%s",
@@ -47,11 +46,18 @@ public class ConverterTask {
         Status status = Status.valueOf(parts[3]);
         String description = parts[4];
         String epicIdStr = parts[5];
-        String startTimeStr = parts.length > 6 ? parts[6] : "";
-        String durationStr = parts.length > 7 ? parts[7] : "";
+        String startTimeStr = parts[6];
+        String durationStr = parts[7];
 
-        LocalDateTime startTime = startTimeStr.isEmpty() ? null : LocalDateTime.parse(startTimeStr);
-        Duration duration = durationStr.isEmpty() ? null : Duration.ofMinutes(Long.parseLong(durationStr));
+        LocalDateTime startTime = null;
+        if (!startTimeStr.isEmpty()) {
+            startTime = LocalDateTime.parse(startTimeStr, formatter);
+        }
+
+        Duration duration = null;
+        if (!durationStr.isEmpty()) {
+            duration = Duration.ofMinutes(Long.parseLong(durationStr));
+        }
 
         Task task;
         switch (type) {
@@ -59,7 +65,7 @@ public class ConverterTask {
                 task = new Task(title, description, status, startTime, duration);
                 break;
             case EPIC:
-                task = new Epic(title, description, status, startTime, duration);
+                task = new Epic(title, description, status);
                 break;
             case SUBTASK:
                 int epicId = Integer.parseInt(parts[5]);

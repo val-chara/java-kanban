@@ -95,8 +95,6 @@ public class Epic extends Task {
         throw new UnsupportedOperationException("Продолжительность рассчитается автоматически.");
     }
 
-
-
     @Override
     public LocalDateTime getStartTime() {
         if (subtaskIds.isEmpty() || taskManager == null) {
