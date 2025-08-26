@@ -11,21 +11,26 @@ import manager.TaskManager;
 public class Epic extends Task {
 
     protected List<Integer> subtaskIds;
-    private final TaskManager inMemoryTaskManager = Manager.getDefault();
-    List<Subtask> subtaskList = inMemoryTaskManager.getAllSubtasks();
+    private LocalDateTime endTime;
+    private static TaskManager taskManager;
 
-    public Epic(String title, String description, Status status, LocalDateTime startTime, Duration duration) {
-        super(title, description, status, startTime, duration);
+    public Epic(String title, String description, Status status) {
+        super(title, description, status, null, null);
         this.subtaskIds = new ArrayList<>();
     }
 
-    public List<Integer> getSubtaskIds() {
+    public static void setTaskManager(TaskManager manager) {
+        taskManager = manager;
+    }
 
+    public List<Integer> getSubtaskIds() {
         return new ArrayList<>(subtaskIds);
     }
 
     public void addSubtask(int subtaskId) {
-        subtaskIds.add(subtaskId);
+        if (!subtaskIds.contains(subtaskId)) {
+            subtaskIds.add(subtaskId);
+        }
     }
 
     public void removeSubtask(int subtaskId) {
@@ -37,9 +42,7 @@ public class Epic extends Task {
     }
 
     @Override
-
     public String toString() {
-
         return "Epic{" +
                 "id=" + getId() +
                 ", title='" + getTitle() + '\'' +
@@ -57,14 +60,51 @@ public class Epic extends Task {
         return TaskType.EPIC;
     }
 
+    public void updateEpicFields(List<Subtask> subtasks) {
+        getDuration();
+        getStartTime();
+        getEndTime();
+        updateStatus(subtasks); // Обновлю статус
+    }
+
+    private void updateStatus(List<Subtask> subtasks) {
+        if (subtasks == null || subtasks.isEmpty()) {
+            setStatus(Status.NEW);
+            return;
+        }
+        boolean allNew = true;
+        boolean allDone = true;
+
+        for (Subtask subtask : subtasks) {
+            if (subtask.getStatus() != Status.NEW) allNew = false;
+            if (subtask.getStatus() != Status.DONE) allDone = false;
+        }
+
+        if (allDone) setStatus(Status.DONE);
+        else if (allNew) setStatus(Status.NEW);
+        else setStatus(Status.IN_PROGRESS);
+    }
+
+    @Override
+    public void setStartTime(LocalDateTime startTime) {
+        throw new UnsupportedOperationException("Время запуска рассчитается автоматически.");
+    }
+
+    @Override
+    public void setDuration(Duration duration) {
+        throw new UnsupportedOperationException("Продолжительность рассчитается автоматически.");
+    }
+
+
+
     @Override
     public LocalDateTime getStartTime() {
-        if (subtaskIds.isEmpty()) {
+        if (subtaskIds.isEmpty() || taskManager == null) {
             return null;
         }
         LocalDateTime earliest = null;
         for (int id : subtaskIds) {
-            Subtask subtask = inMemoryTaskManager.getSubtaskById(id);
+            Subtask subtask = taskManager.getSubtaskById(id);
             if (subtask != null && subtask.getStartTime() != null) {
                 if (earliest == null || subtask.getStartTime().isBefore(earliest)) {
                     earliest = subtask.getStartTime();
@@ -76,12 +116,12 @@ public class Epic extends Task {
 
     @Override
     public LocalDateTime getEndTime() {
-        if (subtaskIds.isEmpty()) {
+        if (subtaskIds.isEmpty() || taskManager == null) {
             return null;
         }
         LocalDateTime latest = null;
         for (int id : subtaskIds) {
-            Subtask subtask = inMemoryTaskManager.getSubtaskById(id);
+            Subtask subtask = taskManager.getSubtaskById(id);
             if (subtask != null && subtask.getEndTime() != null) {
                 if (latest == null || subtask.getEndTime().isAfter(latest)) {
                     latest = subtask.getEndTime();
@@ -92,13 +132,13 @@ public class Epic extends Task {
     }
 
     @Override
-    public Duration getDuration() {
-        if (subtaskIds.isEmpty()) {
+    public Duration getDuration()  {
+        if (subtaskIds.isEmpty() || taskManager == null) {
             return Duration.ZERO;
         }
         long totalMinutes = 0;
         for (int id : subtaskIds) {
-            Subtask subtask = inMemoryTaskManager.getSubtaskById(id);
+            Subtask subtask = taskManager.getSubtaskById(id);
             if (subtask != null && subtask.getDuration() != null) {
                 totalMinutes += subtask.getDuration().toMinutes();
             }

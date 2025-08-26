@@ -17,6 +17,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager(File file) {
         super();
         this.file = file;
+        Epic.setTaskManager(this);
     }
 
     public FileBackedTaskManager() {
@@ -26,6 +27,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
+        Epic.setTaskManager(manager);
         int maxId = 0;
         List<Integer> historyIds = new ArrayList<>();
 
