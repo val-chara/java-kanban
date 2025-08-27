@@ -118,7 +118,7 @@ public class Task {
         return startTime.plus(duration);
     }
 
-    public boolean isTimeOverlap (Task other) {
+    public boolean isTimeOverlap(Task other) {
         if (this.startTime == null || this.duration == null ||
                 other.startTime == null || other.duration == null) {
             return false;
