@@ -130,6 +130,5 @@ public class Task {
 
         return !(thisEnd.isBefore(other.startTime) || thisEnd.equals(other.startTime)) &&
                 !(otherEnd.isBefore(this.startTime) || otherEnd.equals(this.startTime));
-
     }
 }

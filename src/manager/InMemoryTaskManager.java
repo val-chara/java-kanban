@@ -5,6 +5,7 @@ import model.Status;
 import model.Subtask;
 import model.Task;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -344,10 +345,19 @@ public class InMemoryTaskManager implements TaskManager {
         if (newTask.getStartTime() == null || newTask.getDuration() == null) {
             return false;
         }
-        return prioritizedTasks.stream().filter(task -> task.getId() != newTask.getId())
+
+        LocalDateTime newStart = newTask.getStartTime();
+        LocalDateTime newEnd = newTask.getEndTime();
+
+        if (newEnd == null) {
+            return false;
+        }
+
+        return prioritizedTasks.stream()
+                .filter(task -> task.getId() != newTask.getId())
+                .filter(task -> task.getStartTime() != null)
                 .anyMatch(existingTask -> existingTask.isTimeOverlap(newTask));
 
     }
-
 }
 
