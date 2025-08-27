@@ -312,5 +312,14 @@ public class InMemoryTaskManager implements TaskManager {
         this.nextId = nextId;
     }
 
+    public boolean hasTimeOverlap(Task newTask) {
+        if (newTask.getStartTime() == null || newTask.getDuration() == null) {
+            return false;
+        }
+        return prioritizedTasks.stream().filter(task -> task.getId() != newTask.getId())
+                .anyMatch(existingTask -> existingTask.isTimeOverlap(newTask));
+
+    }
+
 }
 
