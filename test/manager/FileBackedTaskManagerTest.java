@@ -13,8 +13,22 @@ import java.nio.file.Files;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class FileBackedTaskManagerTest {
+
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
+
+    protected FileBackedTaskManager createManager() {
+        try {
+            File tempFile = File.createTempFile("tasks", ".csv");
+            tempFile.deleteOnExit();
+            return new FileBackedTaskManager(tempFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private File tempFile;
     private FileBackedTaskManager manager;
 
@@ -56,6 +70,17 @@ class FileBackedTaskManagerTest {
         boolean isIntersect = !(task1.getEndTime().isBefore(task2.getStartTime()) ||
                 task2.getEndTime().isBefore(task1.getStartTime()));
 
-        Assertions.assertTrue(isIntersect, "Задачи должны пересекаться по времени");
+        assertTrue(task1.isTimeOverlap(task2), "Задачи должны пересекаться по времени");
+    }
+
+    @Test
+    void shouldNotDetectIntersectionBetweenNonOverlappingTasks() {
+        LocalDateTime start1 = LocalDateTime.of(2025, 7, 18, 10, 0);
+        Task task1 = new Task("Task 1", "desc", Status.NEW, start1, Duration.ofMinutes(60));
+
+        LocalDateTime start2 = LocalDateTime.of(2025, 7, 18, 11, 30); // Через 1.5 часа
+        Task task2 = new Task("Task 2", "desc", Status.NEW, start2, Duration.ofMinutes(60));
+
+        assertFalse(task1.isTimeOverlap(task2), "Задачи не должны пересекаться по времени");
     }
 }

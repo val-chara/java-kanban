@@ -49,4 +49,5 @@ public interface TaskManager {
 
     List<Task> getPrioritizedTasks();
 
+    void removeTask(int id);
 }

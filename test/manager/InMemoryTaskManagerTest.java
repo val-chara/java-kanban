@@ -8,11 +8,18 @@ import model.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class InMemoryTaskManagerTest {
+class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
+
+    @Override
+    protected InMemoryTaskManager createManager() {
+        return new InMemoryTaskManager();
+    }
+
     private InMemoryTaskManager taskManager;
 
     @BeforeEach

@@ -236,6 +236,12 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
+    public void removeTask(int id) {
+        // Можно просто вызвать существующий deleteTaskById
+        deleteTaskById(id);
+    }
+
+    @Override
     public void deleteAllTasks() {
         prioritizedTasks.removeIf(task -> tasks.containsKey(task.getId()));
         tasks.clear();
