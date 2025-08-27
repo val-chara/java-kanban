@@ -5,8 +5,6 @@ import java.util.List;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
-import manager.Manager;
 import manager.TaskManager;
 
 public class Epic extends Task {
