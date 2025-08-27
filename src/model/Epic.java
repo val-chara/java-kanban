@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import manager.Manager;
 import manager.TaskManager;
@@ -72,17 +73,13 @@ public class Epic extends Task {
             setStatus(Status.NEW);
             return;
         }
-        boolean allNew = true;
-        boolean allDone = true;
-
-        for (Subtask subtask : subtasks) {
-            if (subtask.getStatus() != Status.NEW) allNew = false;
-            if (subtask.getStatus() != Status.DONE) allDone = false;
+        if (subtasks.stream().allMatch(s -> s.getStatus() == Status.NEW)) {
+            setStatus(Status.NEW);
+        } else if (subtasks.stream().allMatch(s -> s.getStatus() == Status.DONE)) {
+            setStatus(Status.DONE);
+        } else {
+            setStatus(Status.IN_PROGRESS);
         }
-
-        if (allDone) setStatus(Status.DONE);
-        else if (allNew) setStatus(Status.NEW);
-        else setStatus(Status.IN_PROGRESS);
     }
 
     @Override
@@ -101,15 +98,14 @@ public class Epic extends Task {
             return null;
         }
         LocalDateTime earliest = null;
-        for (int id : subtaskIds) {
-            Subtask subtask = taskManager.getSubtaskById(id);
-            if (subtask != null && subtask.getStartTime() != null) {
-                if (earliest == null || subtask.getStartTime().isBefore(earliest)) {
-                    earliest = subtask.getStartTime();
-                }
-            }
-        }
-        return earliest;
+
+        return subtaskIds.stream()
+                .map(taskManager::getSubtaskById)
+                .filter(Objects::nonNull)
+                .map(Subtask::getStartTime)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
     }
 
     @Override
@@ -118,15 +114,14 @@ public class Epic extends Task {
             return null;
         }
         LocalDateTime latest = null;
-        for (int id : subtaskIds) {
-            Subtask subtask = taskManager.getSubtaskById(id);
-            if (subtask != null && subtask.getEndTime() != null) {
-                if (latest == null || subtask.getEndTime().isAfter(latest)) {
-                    latest = subtask.getEndTime();
-                }
-            }
-        }
-        return latest;
+
+        return subtaskIds.stream()
+                .map(taskManager::getSubtaskById)
+                .filter(Objects::nonNull)
+                .map(Subtask::getEndTime)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
     }
 
     @Override
@@ -134,15 +129,14 @@ public class Epic extends Task {
         if (subtaskIds.isEmpty() || taskManager == null) {
             return Duration.ZERO;
         }
-        long totalMinutes = 0;
-        for (int id : subtaskIds) {
-            Subtask subtask = taskManager.getSubtaskById(id);
-            if (subtask != null && subtask.getDuration() != null) {
-                totalMinutes += subtask.getDuration().toMinutes();
-            }
-        }
+        long totalMinutes = subtaskIds.stream()
+                .map(taskManager::getSubtaskById)
+                .filter(Objects::nonNull)
+                .map(Subtask::getDuration)
+                .filter(Objects::nonNull)
+                .mapToLong(Duration::toMinutes)
+                .sum();
+
         return Duration.ofMinutes(totalMinutes);
     }
-
-
 }
