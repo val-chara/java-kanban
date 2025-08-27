@@ -25,6 +25,12 @@ public class InMemoryTaskManager implements TaskManager {
                     Comparator.nullsLast(Comparator.naturalOrder()))
     );
 
+    public static class TimeConflictException extends RuntimeException {
+        public TimeConflictException(String message) {
+            super(message);
+        }
+    }
+
     public InMemoryTaskManager() {
 
         this.tasks = new HashMap<>();
@@ -42,6 +48,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task createTask(Task task) {
+        if (hasTimeOverlap(task)) {
+            throw new TimeConflictException("Задача '" + task.getTitle() +
+                    "' пересекается по времени с существующей задачей");
+        }
+
         task.setId(generateId());
         tasks.put(task.getId(), task);
 
@@ -61,6 +72,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Subtask createSubtask(Subtask subtask) {
+        if (hasTimeOverlap(subtask)) {
+            throw new TimeConflictException("Задача '" + subtask.getTitle() +
+                    "' пересекается по времени с существующей задачей");
+        }
+
         int epicId = subtask.getEpicId();
         Epic epic = epics.get(epicId);
         if (epic == null) {
@@ -185,6 +201,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task task) {
+        if (hasTimeOverlap(task)) {
+            throw new TimeConflictException("Задача '" + task.getTitle() +
+                    "' пересекается по времени с существующей задачей");
+        }
+
+
         if (tasks.containsKey(task.getId())) {
             Task oldTask = tasks.put(task.getId(), task);
 
@@ -208,6 +230,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubtask(Subtask subtask) {
+        if (hasTimeOverlap(subtask)) {
+            throw new TimeConflictException("Задача '" + subtask.getTitle() +
+                    "' пересекается по времени с существующей задачей");
+        }
+
+
         if (subtasks.containsKey(subtask.getId())) {
             Subtask oldSubtask = subtasks.put(subtask.getId(), subtask);
 
