@@ -95,16 +95,18 @@ class EpicTest {
         Epic epic = new Epic("Test", "Desc", Status.NEW);
         taskManager.createEpic(epic);
 
+        LocalDateTime now = LocalDateTime.now();
+
         Subtask subtask1 = new Subtask("Sub1", "Desc", Status.NEW, epic.getId(),
-                LocalDateTime.now(), Duration.ofHours(2));
+                now, Duration.ofHours(2));
         Subtask subtask2 = new Subtask("Sub2", "Desc", Status.NEW, epic.getId(),
-                LocalDateTime.now().plusHours(1), Duration.ofHours(3));
+                now.plusHours(3), Duration.ofHours(3));
 
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
-        epic.addSubtask(subtask1.getId());
-        epic.addSubtask(subtask2.getId());
+        //epic.addSubtask(subtask1.getId());
+        //epic.addSubtask(subtask2.getId());
 
         Epic.setTaskManager(taskManager);
 
