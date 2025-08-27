@@ -20,6 +20,11 @@ public class InMemoryTaskManager implements TaskManager {
     protected  int nextId;
     protected final HistoryManager historyManager;
 
+    protected final TreeSet<Task> prioritizedTasks = new TreeSet<>(
+            Comparator.comparing(Task::getStartTime,
+                    Comparator.nullsLast(Comparator.naturalOrder()))
+    );
+
     public InMemoryTaskManager() {
 
         this.tasks = new HashMap<>();
@@ -39,6 +44,11 @@ public class InMemoryTaskManager implements TaskManager {
     public Task createTask(Task task) {
         task.setId(generateId());
         tasks.put(task.getId(), task);
+
+        if (task.getStartTime() != null) {
+            prioritizedTasks.add(task);
+        }
+
         return task;
     }
 
@@ -61,6 +71,10 @@ public class InMemoryTaskManager implements TaskManager {
         subtask.setId(generateId());
         subtasks.put(subtask.getId(), subtask);
         epic.addSubtask(subtask.getId());
+
+        if (subtask.getStartTime() != null) {
+            prioritizedTasks.add(subtask);
+        }
 
         updateEpicStatus(epic.getId());
 
@@ -132,9 +146,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTaskById(int id) {
-        tasks.remove(id);
-        historyManager.remove(id);
-
+        Task task = tasks.remove(id);
+        if (task != null){
+            prioritizedTasks.remove(task);
+            historyManager.remove(id);
+        }
     }
 
     @Override
@@ -143,7 +159,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic != null) {
 
             for (int subtaskId : new ArrayList<>(epic.getSubtaskIds())) {
-                subtasks.remove(subtaskId);
+                Subtask subtask = subtasks.remove(subtaskId);
+                if (subtask != null) {
+                    prioritizedTasks.remove(subtask);
+                }
             }
         }
     }
@@ -153,6 +172,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtasks.containsKey(id)) {
             Subtask subtask = subtasks.get(id);
             subtasks.remove(id);
+
+            prioritizedTasks.remove(subtask);
 
             Epic epic = epics.get(subtask.getEpicId());
                 if (epic != null) {
@@ -165,7 +186,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
-            tasks.put(task.getId(), task);
+            Task oldTask = tasks.put(task.getId(), task);
+
+            prioritizedTasks.remove(oldTask);
+
+            if (task.getStartTime() != null) {
+                prioritizedTasks.add(task);
+            }
         }
     }
 
@@ -182,13 +209,21 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(Subtask subtask) {
         if (subtasks.containsKey(subtask.getId())) {
+            Subtask oldSubtask = subtasks.put(subtask.getId(), subtask);
+
+            prioritizedTasks.remove(oldSubtask);
             subtasks.put(subtask.getId(), subtask);
+            if (subtask.getStartTime() != null) {
+                prioritizedTasks.add(subtask);
+            }
+
             updateEpicStatus(subtask.getEpicId());
         }
     }
 
     @Override
     public void deleteAllTasks() {
+        prioritizedTasks.removeIf(task -> tasks.containsKey(task.getId()));
         tasks.clear();
     }
 
@@ -200,6 +235,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllSubtasks() {
+        prioritizedTasks.removeIf(task -> subtasks.containsKey(task.getId()));
         subtasks.clear();
 
         for (Epic epic : epics.values()) {
@@ -248,10 +284,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getPrioritizedTasks() {
-        TreeSet<Task> prioritized = new TreeSet<>(Comparator.comparing(Task::getStartTime));
-        prioritized.addAll(tasks.values().stream().filter(t -> t.getStartTime() != null).toList());
-        prioritized.addAll(subtasks.values().stream().filter(t -> t.getStartTime() != null).toList());
-        return new ArrayList<>(prioritized);
+        //TreeSet<Task> prioritized = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+        //prioritized.addAll(tasks.values().stream().filter(t -> t.getStartTime() != null).toList());
+        //prioritized.addAll(subtasks.values().stream().filter(t -> t.getStartTime() != null).toList());
+        //return new ArrayList<>(prioritized);
+
+        return new ArrayList<>(prioritizedTasks);
     }
 
     protected void putTask(Task task) {
