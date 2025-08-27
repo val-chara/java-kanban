@@ -2,24 +2,34 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Objects;
+import manager.TaskManager;
 
 public class Epic extends Task {
 
-    private List<Integer> subtaskIds;
+    protected List<Integer> subtaskIds;
+    private LocalDateTime endTime;
+    private static TaskManager taskManager;
 
     public Epic(String title, String description, Status status) {
-        super(title, description, status);
+        super(title, description, status, null, null);
         this.subtaskIds = new ArrayList<>();
     }
 
-    public List<Integer> getSubtaskIds() {
+    public static void setTaskManager(TaskManager manager) {
+        taskManager = manager;
+    }
 
+    public List<Integer> getSubtaskIds() {
         return new ArrayList<>(subtaskIds);
     }
 
     public void addSubtask(int subtaskId) {
-
-        subtaskIds.add(subtaskId);
+        if (!subtaskIds.contains(subtaskId)) {
+            subtaskIds.add(subtaskId);
+        }
     }
 
     public void removeSubtask(int subtaskId) {
@@ -31,15 +41,16 @@ public class Epic extends Task {
     }
 
     @Override
-
     public String toString() {
-
         return "Epic{" +
                 "id=" + getId() +
                 ", title='" + getTitle() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", status=" + getStatus() +
                 ", subtasks=" + subtaskIds +
+                ", startTime=" + getStartTime() +
+                ", endTime=" + getEndTime() +
+                ", duration=" + getDuration() +
                 '}';
     }
 
@@ -48,4 +59,82 @@ public class Epic extends Task {
         return TaskType.EPIC;
     }
 
+    public void updateEpicFields(List<Subtask> subtasks) {
+        getDuration();
+        getStartTime();
+        getEndTime();
+        updateStatus(subtasks); // Обновлю статус
+    }
+
+    private void updateStatus(List<Subtask> subtasks) {
+        if (subtasks == null || subtasks.isEmpty()) {
+            setStatus(Status.NEW);
+            return;
+        }
+        if (subtasks.stream().allMatch(s -> s.getStatus() == Status.NEW)) {
+            setStatus(Status.NEW);
+        } else if (subtasks.stream().allMatch(s -> s.getStatus() == Status.DONE)) {
+            setStatus(Status.DONE);
+        } else {
+            setStatus(Status.IN_PROGRESS);
+        }
+    }
+
+    @Override
+    public void setStartTime(LocalDateTime startTime) {
+        throw new UnsupportedOperationException("Время запуска рассчитается автоматически.");
+    }
+
+    @Override
+    public void setDuration(Duration duration) {
+        throw new UnsupportedOperationException("Продолжительность рассчитается автоматически.");
+    }
+
+    @Override
+    public LocalDateTime getStartTime() {
+        if (subtaskIds.isEmpty() || taskManager == null) {
+            return null;
+        }
+        LocalDateTime earliest = null;
+
+        return subtaskIds.stream()
+                .map(taskManager::getSubtaskById)
+                .filter(Objects::nonNull)
+                .map(Subtask::getStartTime)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        if (subtaskIds.isEmpty() || taskManager == null) {
+            return null;
+        }
+        LocalDateTime latest = null;
+
+        return subtaskIds.stream()
+                .map(taskManager::getSubtaskById)
+                .filter(Objects::nonNull)
+                .map(Subtask::getEndTime)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
+    }
+
+    @Override
+    public Duration getDuration()  {
+        if (subtaskIds.isEmpty() || taskManager == null) {
+            return Duration.ZERO;
+        }
+        long totalMinutes = subtaskIds.stream()
+                .map(taskManager::getSubtaskById)
+                .filter(Objects::nonNull)
+                .map(Subtask::getDuration)
+                .filter(Objects::nonNull)
+                .mapToLong(Duration::toMinutes)
+                .sum();
+
+        return Duration.ofMinutes(totalMinutes);
+    }
 }

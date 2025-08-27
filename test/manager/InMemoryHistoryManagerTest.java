@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import model.*;
 import manager.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,14 +21,17 @@ class InMemoryHistoryManagerTest {
     @BeforeEach
     void setUp() {
         historyManager = new InMemoryHistoryManager();
-        task = new Task("Задача 1", "Описание первой задачи", Status.NEW);
+
+        task = new Task("Задача 1", "Описание задачи", Status.NEW, LocalDateTime.of(2025, 7, 18, 10, 0), Duration.ofMinutes(90));
         task.setId(1);
 
-        task1 = new Task("Задача 1", "Описание задачи t1", Status.NEW);
+        task1 = new Task("Задача 1", "Описание задачи t1", Status.NEW, LocalDateTime.of(2025, 7, 19, 11, 11), Duration.ofMinutes(90));
         task1.setId(1);
-        task2 = new Task("Задача 2", "Описание задачи t2", Status.NEW);
+
+        task2 = new Task("Задача 2", "Описание задачи t2", Status.NEW, LocalDateTime.of(2025, 7, 20, 20, 22), Duration.ofMinutes(90));
         task2.setId(2);
-        task3 = new Task("Задача 3", "Описание задачи t3", Status.NEW);
+
+        task3 = new Task("Задача 3", "Описание задачи t3", Status.NEW, LocalDateTime.of(2025, 7, 21, 21, 22), Duration.ofMinutes(90));
         task3.setId(3);
     }
 
@@ -63,7 +68,7 @@ class InMemoryHistoryManagerTest {
     void addDuplicate_movesToEnd() {
         historyManager.add(task1);
         historyManager.add(task2);
-        historyManager.add(task1); // повтор просмотра t1
+        historyManager.add(task1);
 
         List<Task> h = historyManager.getHistory();
         assertEquals(List.of(task2, task1), h, "t1 должен переместиться в конец");
@@ -85,7 +90,7 @@ class InMemoryHistoryManagerTest {
     @Test
     void remove_nonExisting_doesNothing() {
         historyManager.add(task1);
-        historyManager.remove(99); // нет задачи с id
+        historyManager.remove(99);
         assertEquals(List.of(task1), historyManager.getHistory());
     }
 
