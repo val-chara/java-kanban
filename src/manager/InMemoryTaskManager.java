@@ -6,12 +6,7 @@ import model.Subtask;
 import model.Task;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-import java.util.Comparator;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -132,29 +127,22 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        boolean allNew = true;
-        boolean allDone = true;
+        List<Status> statuses = epic.getSubtaskIds().stream()
+                .map(subtasks::get)
+                .filter(Objects::nonNull)
+                .map(Subtask::getStatus)
+                .toList();
 
-        for (int subtaskId : epic.getSubtaskIds()) {
-
-            Subtask subtask = subtasks.get(subtaskId);
-            Status status = subtask.getStatus();
-
-            if (status != Status.NEW) {
-                allNew = false;
-            }
-            if (status != Status.DONE) {
-                allDone = false;
-            }
-            if (status == Status.IN_PROGRESS) {
-                epic.setStatus(Status.IN_PROGRESS);
-                return;
-            }
+        if (statuses.isEmpty()) {
+            epic.setStatus(Status.NEW);
+            return;
         }
 
-        if (allNew) {
+        if (statuses.contains(Status.IN_PROGRESS)) {
+            epic.setStatus(Status.IN_PROGRESS);
+        } else if (statuses.stream().allMatch(s -> s == Status.NEW)) {
             epic.setStatus(Status.NEW);
-        } else if (allDone) {
+        } else if (statuses.stream().allMatch(s -> s == Status.DONE)) {
             epic.setStatus(Status.DONE);
         } else {
             epic.setStatus(Status.IN_PROGRESS);
@@ -276,19 +264,15 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Subtask> getSubtasksOfEpic(int epicId) {
         Epic epic = epics.get(epicId);
-        List<Subtask> result = new ArrayList<>();
 
-        if (epic != null) {
-
-            for (int subtaskId : epic.getSubtaskIds()) {
-                Subtask subtask = subtasks.get(subtaskId);
-
-                if (subtask != null) {
-                    result.add(subtask);
-                }
-            }
+        if (epic == null) {
+            return List.of();
         }
-        return result;
+
+        return epic.getSubtaskIds().stream()
+                .map(subtasks::get)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     @Override

@@ -1,7 +1,6 @@
 id,type,title,status,description,epic,startTime,duration
 1,EPIC,Эпик ,NEW,Описание эпика,,,0
-2,EPIC,Test,NEW,Desc,,2025-08-26T19:27:24,300
-3,SUBTASK,Sub1,NEW,Desc,2,2025-08-26T19:27:24,120
-4,SUBTASK,Sub2,NEW,Desc,2,2025-08-26T20:27:24,180
+2,EPIC,Test,NEW,Desc,,2025-08-27T11:28:26,120
+3,SUBTASK,Sub1,NEW,Desc,2,2025-08-27T11:28:26,120
 
-3,4
+3
