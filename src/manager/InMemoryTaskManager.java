@@ -347,13 +347,6 @@ public class InMemoryTaskManager implements TaskManager {
             return false;
         }
 
-        //LocalDateTime newStart = newTask.getStartTime();
-        LocalDateTime newEnd = newTask.getEndTime();
-
-        if (newEnd == null) {
-            return false;
-        }
-
         return prioritizedTasks.stream()
                 .filter(task -> task.getId() != newTask.getId())
                 .filter(task -> task.getStartTime() != null)
