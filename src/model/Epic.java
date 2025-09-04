@@ -91,6 +91,7 @@ public class Epic extends Task {
             setStatus(Status.IN_PROGRESS);
         }
     }
+
     private void updateTime(List<Subtask> subtasks) {
         if (subtasks == null || subtasks.isEmpty()) {
             setStartTimeInternal(null);
