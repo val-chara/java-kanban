@@ -62,15 +62,15 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         LocalDateTime start1 = LocalDateTime.of(2025, 7, 18, 10, 0);
         Duration duration1 = Duration.ofMinutes(60);
         Task task1 = new Task("Task 1", "desc", Status.NEW, start1, duration1);
+        manager.createTask(task1);
 
         LocalDateTime start2 = LocalDateTime.of(2025, 7, 18, 10, 30);
         Duration duration2 = Duration.ofMinutes(60);
         Task task2 = new Task("Task 2", "desc", Status.NEW, start2, duration2);
 
-        //boolean isIntersect = !(task1.getEndTime().isBefore(task2.getStartTime()) ||
-        //        task2.getEndTime().isBefore(task1.getStartTime()));
+        boolean isOverlap = manager.hasTimeOverlap(task2);
 
-        assertTrue(task1.isTimeOverlap(task2), "Задачи должны пересекаться по времени");
+        assertTrue(isOverlap, "Задачи должны пересекаться по времени");
     }
 
     @Test
@@ -81,6 +81,8 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         LocalDateTime start2 = LocalDateTime.of(2025, 7, 18, 11, 30); // Через 1.5 часа
         Task task2 = new Task("Task 2", "desc", Status.NEW, start2, Duration.ofMinutes(60));
 
-        assertFalse(task1.isTimeOverlap(task2), "Задачи не должны пересекаться по времени");
+        boolean isOverlap = manager.hasTimeOverlap(task2);
+
+        assertFalse(isOverlap, "Задачи не должны пересекаться по времени");
     }
 }
