@@ -6,10 +6,12 @@ import model.Subtask;
 import model.Task;
 import exception.TimeConflictException;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.*;
+
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -126,11 +128,40 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        List<Subtask> epicSubtasks = getAllSubtasks().stream()
-                .filter(subtask -> subtask.getEpicId() == epicId)
-                .collect(Collectors.toList());
+        List<Subtask> epicSubtasks = getSubtasksOfEpic(epicId);
 
-        epic.updateEpicFields(epicSubtasks);
+        if (epicSubtasks.isEmpty()) {
+            epic.setStatus(Status.NEW);
+        } else if (epicSubtasks.stream().allMatch(s -> s.getStatus() == Status.NEW)) {
+            epic.setStatus(Status.NEW);
+        } else if (epicSubtasks.stream().allMatch(s -> s.getStatus() == Status.DONE)) {
+            epic.setStatus(Status.DONE);
+        } else {
+            epic.setStatus(Status.IN_PROGRESS);
+        }
+
+        if (epicSubtasks.isEmpty()) {
+            epic.setEpicTimes(null, Duration.ZERO, null);
+            return;
+        }
+
+        Optional<LocalDateTime> earliestStart = epicSubtasks.stream()
+                .map(Subtask::getStartTime)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo);
+
+        Optional<LocalDateTime> latestEnd = epicSubtasks.stream()
+                .map(Subtask::getEndTime)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo);
+
+        if (earliestStart.isPresent() && latestEnd.isPresent()) {
+            epic.setEpicTimes(earliestStart.get(),
+                    Duration.between(earliestStart.get(), latestEnd.get()),
+                    latestEnd.get());
+        } else {
+            epic.setEpicTimes(null, Duration.ZERO, null);
+        }
     }
 
     private void updateEpicStatus(int epicId) {
@@ -143,7 +174,6 @@ public class InMemoryTaskManager implements TaskManager {
         List<Subtask> epicSubtasks = getSubtasksOfEpic(epicId);
         updateEpicStatus(epic, epicSubtasks);
     }
-
 
     private void updateEpicStatus(Epic epic, List<Subtask> epicSubtasks) {
         if (epic == null || epicSubtasks == null) {
@@ -355,8 +385,15 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private boolean isTimeOverlap(Task task1, Task task2) {
+        LocalDateTime task1Start = task1.getStartTime();
+        LocalDateTime task1End = task1.getEndTime();
+        LocalDateTime task2Start = task2.getStartTime();
+        LocalDateTime task2End = task2.getEndTime();
 
-        return task1.isTimeOverlap(task2);
+        if (task1Start == null || task1End == null || task2Start == null || task2End == null) {
+            return false;
+        }
+        return task1Start.isBefore(task2End) && task1End.isAfter(task2Start);
     }
 }
 

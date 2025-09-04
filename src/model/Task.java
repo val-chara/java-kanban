@@ -25,7 +25,6 @@ public class Task {
     public Task(String title, String description, Status status, LocalDateTime startTime, Duration duration) {
         this.title = title;
         this.description = description;
-        //this.id = id;
         this.status = status;
         this.startTime = startTime;
         this.duration = duration;
@@ -117,26 +116,11 @@ public class Task {
         }
         return startTime.plus(duration);
     }
-
-    public boolean isTimeOverlap(Task other) {
-        if (this.startTime == null || this.duration == null ||
-                other.startTime == null || other.duration == null) {
-            return false;
-        }
-
-        LocalDateTime thisStart = this.getStartTime();
-        LocalDateTime thisEnd = this.getEndTime();
-        LocalDateTime otherStart = other.getStartTime();
-        LocalDateTime otherEnd = other.getEndTime();
-
-        return thisStart.isBefore(otherEnd) && thisEnd.isAfter(otherStart);
-    }
-
-    public void setStartTimeInternal(LocalDateTime startTime) {
+    protected void updateStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
-    public void setDurationInternal(Duration duration) {
+    protected void updateDuration(Duration duration) {
         this.duration = duration;
     }
 }

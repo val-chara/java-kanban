@@ -13,6 +13,12 @@ public class Epic extends Task {
     protected List<Integer> subtaskIds;
     private LocalDateTime endTime;
 
+    public void setEpicTimes(LocalDateTime startTime, Duration duration, LocalDateTime endTime) {
+        super.updateStartTime(startTime);
+        super.updateDuration(duration);
+        setEndTimeInternal(endTime);
+    }
+
     public Epic(String title, String description, Status status) {
         super(title, description, status, null, null);
         this.subtaskIds = new ArrayList<>();
@@ -35,14 +41,6 @@ public class Epic extends Task {
 
     public void clearSubtasks() {
         subtaskIds.clear();
-    }
-
-    public void setStartTimeInternal(LocalDateTime startTime) {
-        super.setStartTimeInternal(startTime);
-    }
-
-    public void setDurationInternal(Duration duration) {
-        super.setDurationInternal(duration);
     }
 
     public void setEndTimeInternal(LocalDateTime endTime) {
@@ -71,54 +69,6 @@ public class Epic extends Task {
     @Override
     public TaskType getType() {
         return TaskType.EPIC;
-    }
-
-    public void updateEpicFields(List<Subtask> subtasks) {
-        updateStatus(subtasks);
-        updateTime(subtasks);
-    }
-
-    private void updateStatus(List<Subtask> subtasks) {
-        if (subtasks == null || subtasks.isEmpty()) {
-            setStatus(Status.NEW);
-            return;
-        }
-        if (subtasks.stream().allMatch(s -> s.getStatus() == Status.NEW)) {
-            setStatus(Status.NEW);
-        } else if (subtasks.stream().allMatch(s -> s.getStatus() == Status.DONE)) {
-            setStatus(Status.DONE);
-        } else {
-            setStatus(Status.IN_PROGRESS);
-        }
-    }
-
-    private void updateTime(List<Subtask> subtasks) {
-        if (subtasks == null || subtasks.isEmpty()) {
-            setStartTimeInternal(null);
-            setDurationInternal(Duration.ZERO);
-            setEndTimeInternal(null);
-            return;
-        }
-
-        Optional<LocalDateTime> earliestStart = subtasks.stream()
-                .map(Subtask::getStartTime)
-                .filter(Objects::nonNull)
-                .min(LocalDateTime::compareTo);
-
-        Optional<LocalDateTime> latestEnd = subtasks.stream()
-                .map(Subtask::getEndTime)
-                .filter(Objects::nonNull)
-                .max(LocalDateTime::compareTo);
-
-        if (earliestStart.isPresent() && latestEnd.isPresent()) {
-            setStartTimeInternal(earliestStart.get());
-            setEndTimeInternal(latestEnd.get());
-            setDurationInternal(Duration.between(earliestStart.get(), latestEnd.get()));
-        } else {
-            setStartTimeInternal(null);
-            setDurationInternal(Duration.ZERO);
-            setEndTimeInternal(null);
-        }
     }
 
     @Override
