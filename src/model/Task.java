@@ -116,6 +116,7 @@ public class Task {
         }
         return startTime.plus(duration);
     }
+
     protected void updateStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
