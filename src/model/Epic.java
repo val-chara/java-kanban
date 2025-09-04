@@ -5,21 +5,18 @@ import java.util.List;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import manager.TaskManager;
+import java.util.Optional;
+
 
 public class Epic extends Task {
 
     protected List<Integer> subtaskIds;
     private LocalDateTime endTime;
-    private static TaskManager taskManager;
 
     public Epic(String title, String description, Status status) {
         super(title, description, status, null, null);
         this.subtaskIds = new ArrayList<>();
-    }
-
-    public static void setTaskManager(TaskManager manager) {
-        taskManager = manager;
+        this.endTime = null;
     }
 
     public List<Integer> getSubtaskIds() {
@@ -38,6 +35,23 @@ public class Epic extends Task {
 
     public void clearSubtasks() {
         subtaskIds.clear();
+    }
+
+    public void setStartTimeInternal(LocalDateTime startTime) {
+        super.setStartTimeInternal(startTime);
+    }
+
+    public void setDurationInternal(Duration duration) {
+        super.setDurationInternal(duration);
+    }
+
+    public void setEndTimeInternal(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     @Override
@@ -60,10 +74,8 @@ public class Epic extends Task {
     }
 
     public void updateEpicFields(List<Subtask> subtasks) {
-        getDuration();
-        getStartTime();
-        getEndTime();
-        updateStatus(subtasks); // Обновлю статус
+        updateStatus(subtasks);
+        updateTime(subtasks);
     }
 
     private void updateStatus(List<Subtask> subtasks) {
@@ -79,6 +91,34 @@ public class Epic extends Task {
             setStatus(Status.IN_PROGRESS);
         }
     }
+    private void updateTime(List<Subtask> subtasks) {
+        if (subtasks == null || subtasks.isEmpty()) {
+            setStartTimeInternal(null);
+            setDurationInternal(Duration.ZERO);
+            setEndTimeInternal(null);
+            return;
+        }
+
+        Optional<LocalDateTime> earliestStart = subtasks.stream()
+                .map(Subtask::getStartTime)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo);
+
+        Optional<LocalDateTime> latestEnd = subtasks.stream()
+                .map(Subtask::getEndTime)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo);
+
+        if (earliestStart.isPresent() && latestEnd.isPresent()) {
+            setStartTimeInternal(earliestStart.get());
+            setEndTimeInternal(latestEnd.get());
+            setDurationInternal(Duration.between(earliestStart.get(), latestEnd.get()));
+        } else {
+            setStartTimeInternal(null);
+            setDurationInternal(Duration.ZERO);
+            setEndTimeInternal(null);
+        }
+    }
 
     @Override
     public void setStartTime(LocalDateTime startTime) {
@@ -90,51 +130,16 @@ public class Epic extends Task {
         throw new UnsupportedOperationException("Продолжительность рассчитается автоматически.");
     }
 
+    public void setEndTime(LocalDateTime endTime) {
+        throw new UnsupportedOperationException("Время окончания эпика рассчитывается автоматически на основе подзадач.");
+    }
+
     @Override
     public LocalDateTime getStartTime() {
-        if (subtaskIds.isEmpty() || taskManager == null) {
-            return null;
-        }
-        LocalDateTime earliest = null;
-
-        return subtaskIds.stream()
-                .map(taskManager::getSubtaskById)
-                .filter(Objects::nonNull)
-                .map(Subtask::getStartTime)
-                .filter(Objects::nonNull)
-                .min(LocalDateTime::compareTo)
-                .orElse(null);
+        return super.getStartTime();
     }
-
     @Override
-    public LocalDateTime getEndTime() {
-        if (subtaskIds.isEmpty() || taskManager == null) {
-            return null;
-        }
-        LocalDateTime latest = null;
-
-        return subtaskIds.stream()
-                .map(taskManager::getSubtaskById)
-                .filter(Objects::nonNull)
-                .map(Subtask::getEndTime)
-                .filter(Objects::nonNull)
-                .max(LocalDateTime::compareTo)
-                .orElse(null);
-    }
-
-    @Override
-    public Duration getDuration()  {
-        if (subtaskIds.isEmpty() || taskManager == null) {
-            return Duration.ZERO;
-        }
-        long totalMinutes = subtaskIds.stream()
-                .map(taskManager::getSubtaskById)
-                .filter(Objects::nonNull)
-                .map(Subtask::getDuration)
-                .filter(Objects::nonNull)
-                .mapToLong(Duration::toMinutes)
-                .sum();
-
-        return Duration.ofMinutes(totalMinutes);
+    public Duration getDuration() {
+        return super.getDuration();
     }
 }

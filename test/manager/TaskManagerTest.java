@@ -69,19 +69,19 @@ abstract class TaskManagerTest<T extends TaskManager> {
         }
 
         @Test
-        void testTaskTimeOverlap() {
+        void testTaskTimeOverlap_Before() {
             manager = createManager();
             Task task1 = manager.createTask(new Task("Task1", "Desc", Status.NEW,
                     LocalDateTime.of(2025, 8, 27, 10, 0), Duration.ofMinutes(60)));
 
-            assertThrows(InMemoryTaskManager.TimeConflictException.class, () -> {
+            assertDoesNotThrow(() -> {
                 manager.createTask(new Task("Task2", "Desc", Status.NEW,
-                        LocalDateTime.of(2025, 8, 27, 10, 30), Duration.ofMinutes(60)));
+                        LocalDateTime.of(2025, 8, 27, 9, 0), Duration.ofMinutes(30)));
             });
         }
 
         @Test
-        void testTaskTimeNoOverlap() {
+        void testTaskTimeNoOverlap_After() {
             manager = createManager();
             Task task1 = manager.createTask(new Task("Task1", "Desc", Status.NEW,
                     LocalDateTime.of(2025, 8, 27, 10, 0), Duration.ofMinutes(60)));
@@ -134,21 +134,17 @@ abstract class TaskManagerTest<T extends TaskManager> {
             Task task3 = manager.createTask(new Task("Task3", "Desc", Status.NEW,
                 LocalDateTime.of(2025, 8, 27, 12, 0), Duration.ofMinutes(60)));
 
-        // добавляем все задачи в историю
             manager.getTaskById(task1.getId());
             manager.getTaskById(task2.getId());
             manager.getTaskById(task3.getId());
 
-        // удаляем первую
-            manager.removeTask(task1.getId());
+            manager.deleteTaskById(task1.getId());
             assertFalse(manager.getHistory().contains(task1));
 
-        // удаляем середину
-            manager.removeTask(task2.getId());
+            manager.deleteTaskById(task2.getId());
             assertFalse(manager.getHistory().contains(task2));
 
-        // удаляем конец
-            manager.removeTask(task3.getId());
+            manager.deleteTaskById(task3.getId());
             assertFalse(manager.getHistory().contains(task3));
         }
 
@@ -161,4 +157,87 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 FileBackedTaskManager.loadFromFile(invalidFile);
             });
         }
+    @Test
+    void testTaskTimeOverlap_ExactSameTime() {
+        manager = createManager();
+        Task task1 = manager.createTask(new Task("Task1", "Desc", Status.NEW,
+                LocalDateTime.of(2025, 8, 27, 10, 0), Duration.ofMinutes(60)));
+
+        assertThrows(Exception.class, () -> {
+            manager.createTask(new Task("Task2", "Desc", Status.NEW,
+                    LocalDateTime.of(2025, 8, 27, 10, 0), Duration.ofMinutes(60)));
+        });
+    }
+
+    @Test
+    void testTaskTimeOverlap_StartInside() {
+        manager = createManager();
+        Task task1 = manager.createTask(new Task("Task1", "Desc", Status.NEW,
+                LocalDateTime.of(2025, 8, 27, 10, 0), Duration.ofMinutes(60)));
+
+        assertThrows(Exception.class, () -> {
+            manager.createTask(new Task("Task2", "Desc", Status.NEW,
+                    LocalDateTime.of(2025, 8, 27, 10, 30), Duration.ofMinutes(60)));
+        });
+    }
+
+    @Test
+    void testTaskTimeOverlap_EndInside() {
+        manager = createManager();
+        Task task1 = manager.createTask(new Task("Task1", "Desc", Status.NEW,
+                LocalDateTime.of(2025, 8, 27, 10, 0), Duration.ofMinutes(60)));
+
+        assertThrows(Exception.class, () -> {
+            manager.createTask(new Task("Task2", "Desc", Status.NEW,
+                    LocalDateTime.of(2025, 8, 27, 9, 30), Duration.ofMinutes(60)));
+        });
+    }
+
+    @Test
+    void testTaskTimeOverlap_CompletelyInside() {
+        manager = createManager();
+        Task task1 = manager.createTask(new Task("Task1", "Desc", Status.NEW,
+                LocalDateTime.of(2025, 8, 27, 10, 0), Duration.ofMinutes(120)));
+
+        assertThrows(Exception.class, () -> {
+            manager.createTask(new Task("Task2", "Desc", Status.NEW,
+                    LocalDateTime.of(2025, 8, 27, 10, 30), Duration.ofMinutes(30)));
+        });
+    }
+
+    @Test
+    void testTaskTimeOverlap_CompletelyOutside() {
+        manager = createManager();
+        Task task1 = manager.createTask(new Task("Task1", "Desc", Status.NEW,
+                LocalDateTime.of(2025, 8, 27, 10, 30), Duration.ofMinutes(30)));
+
+        assertThrows(Exception.class, () -> {
+            manager.createTask(new Task("Task2", "Desc", Status.NEW,
+                    LocalDateTime.of(2025, 8, 27, 10, 0), Duration.ofMinutes(120)));
+        });
+    }
+
+    @Test
+    void testTaskTimeNoOverlap_EndExactlyAtStart() {
+        manager = createManager();
+        Task task1 = manager.createTask(new Task("Task1", "Desc", Status.NEW,
+                LocalDateTime.of(2025, 8, 27, 10, 0), Duration.ofMinutes(60)));
+
+        assertDoesNotThrow(() -> {
+            manager.createTask(new Task("Task2", "Desc", Status.NEW,
+                    LocalDateTime.of(2025, 8, 27, 11, 0), Duration.ofMinutes(30)));
+        });
+    }
+
+    @Test
+    void testTaskTimeNoOverlap_StartExactlyAtEnd() {
+        manager = createManager();
+        Task task1 = manager.createTask(new Task("Task1", "Desc", Status.NEW,
+                LocalDateTime.of(2025, 8, 27, 10, 0), Duration.ofMinutes(60)));
+
+        assertDoesNotThrow(() -> {
+            manager.createTask(new Task("Task2", "Desc", Status.NEW,
+                    LocalDateTime.of(2025, 8, 27, 9, 0), Duration.ofMinutes(60)));
+        });
+    }
 }

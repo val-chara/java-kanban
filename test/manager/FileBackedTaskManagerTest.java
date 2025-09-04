@@ -67,8 +67,8 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         Duration duration2 = Duration.ofMinutes(60);
         Task task2 = new Task("Task 2", "desc", Status.NEW, start2, duration2);
 
-        boolean isIntersect = !(task1.getEndTime().isBefore(task2.getStartTime()) ||
-                task2.getEndTime().isBefore(task1.getStartTime()));
+        //boolean isIntersect = !(task1.getEndTime().isBefore(task2.getStartTime()) ||
+        //        task2.getEndTime().isBefore(task1.getStartTime()));
 
         assertTrue(task1.isTimeOverlap(task2), "Задачи должны пересекаться по времени");
     }

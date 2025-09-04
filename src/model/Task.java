@@ -124,10 +124,19 @@ public class Task {
             return false;
         }
 
+        LocalDateTime thisStart = this.getStartTime();
         LocalDateTime thisEnd = this.getEndTime();
+        LocalDateTime otherStart = other.getStartTime();
         LocalDateTime otherEnd = other.getEndTime();
 
-        return !(thisEnd.isBefore(other.startTime) || thisEnd.equals(other.startTime)) &&
-                !(otherEnd.isBefore(this.startTime) || otherEnd.equals(this.startTime));
+        return thisStart.isBefore(otherEnd) && thisEnd.isAfter(otherStart);
+    }
+
+    public void setStartTimeInternal(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setDurationInternal(Duration duration) {
+        this.duration = duration;
     }
 }
