@@ -11,8 +11,8 @@ public class Epic extends Task {
     private LocalDateTime endTime;
 
     public void setEpicTimes(LocalDateTime startTime, Duration duration, LocalDateTime endTime) {
-        super.updateStartTime(startTime);
-        super.updateDuration(duration);
+        super.setStartTime(startTime);
+        super.setDuration(duration);
         setEndTimeInternal(endTime);
     }
 
