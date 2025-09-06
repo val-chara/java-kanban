@@ -10,12 +10,6 @@ public class Epic extends Task {
     protected List<Integer> subtaskIds;
     private LocalDateTime endTime;
 
-    public void setEpicTimes(LocalDateTime startTime, Duration duration, LocalDateTime endTime) {
-        super.setStartTime(startTime);
-        super.setDuration(duration);
-        setEndTimeInternal(endTime);
-    }
-
     public Epic(String title, String description, Status status) {
         super(title, description, status, null, null);
         this.subtaskIds = new ArrayList<>();
@@ -38,10 +32,6 @@ public class Epic extends Task {
 
     public void clearSubtasks() {
         subtaskIds.clear();
-    }
-
-    public void setEndTimeInternal(LocalDateTime endTime) {
-        this.endTime = endTime;
     }
 
     @Override
@@ -68,18 +58,8 @@ public class Epic extends Task {
         return TaskType.EPIC;
     }
 
-    @Override
-    public void setStartTime(LocalDateTime startTime) {
-        throw new UnsupportedOperationException("Время запуска рассчитается автоматически.");
-    }
-
-    @Override
-    public void setDuration(Duration duration) {
-        throw new UnsupportedOperationException("Продолжительность рассчитается автоматически.");
-    }
-
     public void setEndTime(LocalDateTime endTime) {
-        throw new UnsupportedOperationException("Время окончания эпика рассчитывается автоматически на основе подзадач.");
+        this.endTime = endTime;
     }
 
     @Override
