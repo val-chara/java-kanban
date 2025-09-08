@@ -2,24 +2,28 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class Epic extends Task {
 
-    private List<Integer> subtaskIds;
+    protected List<Integer> subtaskIds;
+    private LocalDateTime endTime;
 
     public Epic(String title, String description, Status status) {
-        super(title, description, status);
+        super(title, description, status, null, null);
         this.subtaskIds = new ArrayList<>();
+        this.endTime = null;
     }
 
     public List<Integer> getSubtaskIds() {
-
         return new ArrayList<>(subtaskIds);
     }
 
     public void addSubtask(int subtaskId) {
-
-        subtaskIds.add(subtaskId);
+        if (!subtaskIds.contains(subtaskId)) {
+            subtaskIds.add(subtaskId);
+        }
     }
 
     public void removeSubtask(int subtaskId) {
@@ -31,15 +35,21 @@ public class Epic extends Task {
     }
 
     @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
 
+    @Override
     public String toString() {
-
         return "Epic{" +
                 "id=" + getId() +
                 ", title='" + getTitle() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", status=" + getStatus() +
                 ", subtasks=" + subtaskIds +
+                ", startTime=" + getStartTime() +
+                ", endTime=" + getEndTime() +
+                ", duration=" + getDuration() +
                 '}';
     }
 
@@ -48,4 +58,17 @@ public class Epic extends Task {
         return TaskType.EPIC;
     }
 
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
+    public LocalDateTime getStartTime() {
+        return super.getStartTime();
+    }
+
+    @Override
+    public Duration getDuration() {
+        return super.getDuration();
+    }
 }
