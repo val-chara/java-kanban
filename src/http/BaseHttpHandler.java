@@ -26,12 +26,14 @@ public abstract class BaseHttpHandler implements HttpHandler {
                 .registerTypeAdapter(Duration.class, new DurationAdapter())
                 .create();
     }
+
     public static Gson getGson() {
         return new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
                 .registerTypeAdapter(Duration.class, new DurationAdapter())
                 .create();
     }
+
     private static class DurationAdapter extends TypeAdapter<Duration> {
         @Override
         public void write(JsonWriter out, Duration value) throws IOException {
@@ -41,6 +43,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
                 out.value(value.toSeconds());
             }
         }
+
         @Override
         public Duration read(JsonReader in) throws IOException {
             if (in.peek() == com.google.gson.stream.JsonToken.NULL) {
