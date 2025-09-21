@@ -1,6 +1,7 @@
 package http;
 
 import com.google.gson.Gson;
+import http.handler.BaseHttpHandler;
 import manager.InMemoryTaskManager;
 import manager.TaskManager;
 import model.Task;
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class HttpTaskManagerHistoryTest {
+public class HttpTaskManagerHistoryTest {
     private TaskManager manager;
     private HttpTaskServer taskServer;
     private Gson gson;
@@ -33,7 +34,7 @@ class HttpTaskManagerHistoryTest {
     }
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         manager.deleteAllTasks();
         manager.deleteAllSubtasks();
         manager.deleteAllEpics();
@@ -41,12 +42,12 @@ class HttpTaskManagerHistoryTest {
     }
 
     @AfterEach
-    void shutDown() {
+    public void shutDown() {
         taskServer.stop();
     }
 
     @Test
-    void testGetHistory() throws IOException, InterruptedException {
+    public void testGetHistory() throws IOException, InterruptedException {
         Task task = new Task("Test task", "Testing task", Status.NEW,
                 LocalDateTime.now(), Duration.ofMinutes(30));
         Task createdTask = manager.createTask(task);
@@ -65,7 +66,7 @@ class HttpTaskManagerHistoryTest {
     }
 
     @Test
-    void testGetEmptyHistory() throws IOException, InterruptedException {
+    public void testGetEmptyHistory() throws IOException, InterruptedException {
         URI url = URI.create("http://localhost:8080/history");
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
 

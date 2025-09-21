@@ -1,6 +1,7 @@
 package http;
 
 import com.google.gson.Gson;
+import http.handler.BaseHttpHandler;
 import manager.InMemoryTaskManager;
 import manager.TaskManager;
 import model.Epic;
@@ -21,7 +22,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class HttpTaskManagerEpicsTest {
+public class HttpTaskManagerEpicsTest {
     private TaskManager manager;
     private HttpTaskServer taskServer;
     private Gson gson;
@@ -35,7 +36,7 @@ class HttpTaskManagerEpicsTest {
     }
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         manager.deleteAllTasks();
         manager.deleteAllSubtasks();
         manager.deleteAllEpics();
@@ -43,12 +44,12 @@ class HttpTaskManagerEpicsTest {
     }
 
     @AfterEach
-    void shutDown() {
+    public void shutDown() {
         taskServer.stop();
     }
 
     @Test
-    void testAddEpic() throws IOException, InterruptedException {
+    public void testAddEpic() throws IOException, InterruptedException {
         Epic epic = new Epic("Test epic", "Testing epic", Status.NEW);
         String epicJson = gson.toJson(epic);
 
@@ -67,7 +68,7 @@ class HttpTaskManagerEpicsTest {
     }
 
     @Test
-    void testGetEpics() throws IOException, InterruptedException {
+    public void testGetEpics() throws IOException, InterruptedException {
         Epic epic = new Epic("Test epic", "Testing epic", Status.NEW);
         manager.createEpic(epic);
 
@@ -83,7 +84,7 @@ class HttpTaskManagerEpicsTest {
     }
 
     @Test
-    void testGetEpicById() throws IOException, InterruptedException {
+    public void testGetEpicById() throws IOException, InterruptedException {
         Epic epic = new Epic("Test epic", "Testing epic", Status.NEW);
         Epic createdEpic = manager.createEpic(epic);
 
@@ -99,7 +100,7 @@ class HttpTaskManagerEpicsTest {
     }
 
     @Test
-    void testGetEpicSubtasks() throws IOException, InterruptedException {
+    public void testGetEpicSubtasks() throws IOException, InterruptedException {
         Epic epic = new Epic("Test epic", "Testing epic", Status.NEW);
         Epic createdEpic = manager.createEpic(epic);
 
@@ -119,7 +120,7 @@ class HttpTaskManagerEpicsTest {
     }
 
     @Test
-    void testGetEpicByIdNotFound() throws IOException, InterruptedException {
+    public void testGetEpicByIdNotFound() throws IOException, InterruptedException {
         URI url = URI.create("http://localhost:8080/epics/999");
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
 

@@ -1,6 +1,7 @@
 package http;
 
 import com.google.gson.Gson;
+import http.handler.BaseHttpHandler;
 import manager.InMemoryTaskManager;
 import manager.TaskManager;
 import model.Task;
@@ -20,7 +21,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class HttpTaskManagerTasksTest {
+public class HttpTaskManagerTasksTest {
     private TaskManager manager;
     private HttpTaskServer taskServer;
     private Gson gson;
@@ -34,7 +35,7 @@ class HttpTaskManagerTasksTest {
     }
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         manager.deleteAllTasks();
         manager.deleteAllSubtasks();
         manager.deleteAllEpics();
@@ -42,12 +43,12 @@ class HttpTaskManagerTasksTest {
     }
 
     @AfterEach
-    void shutDown() {
+    public void shutDown() {
         taskServer.stop();
     }
 
     @Test
-    void testAddTask() throws IOException, InterruptedException {
+    public void testAddTask() throws IOException, InterruptedException {
         Task task = new Task("Test task", "Testing task", Status.NEW,
                 LocalDateTime.now(), Duration.ofMinutes(30));
         String taskJson = gson.toJson(task);
@@ -69,7 +70,7 @@ class HttpTaskManagerTasksTest {
     }
 
     @Test
-    void testGetTasks() throws IOException, InterruptedException {
+    public void testGetTasks() throws IOException, InterruptedException {
         Task task = new Task("Test task", "Testing task", Status.NEW,
                 LocalDateTime.now(), Duration.ofMinutes(30));
         manager.createTask(task);
@@ -86,7 +87,7 @@ class HttpTaskManagerTasksTest {
     }
 
     @Test
-    void testGetTaskById() throws IOException, InterruptedException {
+    public void testGetTaskById() throws IOException, InterruptedException {
         Task task = new Task("Test task", "Testing task", Status.NEW,
                 LocalDateTime.now(), Duration.ofMinutes(30));
         Task createdTask = manager.createTask(task);
@@ -103,7 +104,7 @@ class HttpTaskManagerTasksTest {
     }
 
     @Test
-    void testGetTaskByIdNotFound() throws IOException, InterruptedException {
+    public void testGetTaskByIdNotFound() throws IOException, InterruptedException {
         URI url = URI.create("http://localhost:8080/tasks/999");
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
 
@@ -112,7 +113,7 @@ class HttpTaskManagerTasksTest {
     }
 
     @Test
-    void testUpdateTask() throws IOException, InterruptedException {
+    public void testUpdateTask() throws IOException, InterruptedException {
         Task task = new Task("Test task", "Testing task", Status.NEW,
                 LocalDateTime.now(), Duration.ofMinutes(30));
         Task createdTask = manager.createTask(task);
@@ -133,7 +134,7 @@ class HttpTaskManagerTasksTest {
     }
 
     @Test
-    void testDeleteTask() throws IOException, InterruptedException {
+    public void testDeleteTask() throws IOException, InterruptedException {
         Task task = new Task("Test task", "Testing task", Status.NEW,
                 LocalDateTime.now(), Duration.ofMinutes(30));
         Task createdTask = manager.createTask(task);
@@ -148,7 +149,7 @@ class HttpTaskManagerTasksTest {
     }
 
     @Test
-    void testDeleteAllTasks() throws IOException, InterruptedException {
+    public void testDeleteAllTasks() throws IOException, InterruptedException {
         Task task1 = new Task("Test task 1", "Testing task 1", Status.NEW,
                 LocalDateTime.now(), Duration.ofMinutes(30));
         Task task2 = new Task("Test task 2", "Testing task 2", Status.NEW,

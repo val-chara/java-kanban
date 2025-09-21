@@ -1,17 +1,17 @@
-package http;
+package http.handler;
 
 import com.sun.net.httpserver.HttpExchange;
 import manager.TaskManager;
-import model.Subtask;
+import model.Task;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-public class SubtaskHandler extends BaseHttpHandler {
+public class TaskHandler extends BaseHttpHandler {
     private final TaskManager taskManager;
 
-    public SubtaskHandler(TaskManager taskManager) {
+    public TaskHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
     }
 
@@ -23,32 +23,32 @@ public class SubtaskHandler extends BaseHttpHandler {
             String[] pathParts = path.split("/");
 
             if (method.equals("GET") && pathParts.length == 2) {
-                handleGetAllSubtasks(exchange);
+                handleGetAllTasks(exchange);
                 return;
             }
             if (method.equals("GET") && pathParts.length == 3) {
                 int id = parseId(pathParts[2]);
                 if (id != -1) {
-                    handleGetSubtaskById(exchange, id);
+                    handleGetTaskById(exchange, id);
                 } else {
-                    sendBadRequest(exchange, "Некорректный ID подзадачи.");
+                    sendBadRequest(exchange, "Некорректный ID задачи.");
                 }
                 return;
             }
             if (method.equals("POST") && pathParts.length == 2) {
-                handleCreateOrUpdateSubtask(exchange, Optional.empty());
+                handleCreateOrUpdateTask(exchange, Optional.empty());
                 return;
             }
             if (method.equals("DELETE") && pathParts.length == 2) {
-                handleDeleteAllSubtasks(exchange);
+                handleDeleteAllTasks(exchange);
                 return;
             }
             if (method.equals("DELETE") && pathParts.length == 3) {
                 int id = parseId(pathParts[2]);
                 if (id != -1) {
-                    handleDeleteSubtaskById(exchange, id);
+                    handleDeleteTaskById(exchange, id);
                 } else {
-                    sendBadRequest(exchange, "Некорректный ID подзадачи.");
+                    sendBadRequest(exchange, "Некорректный ID задачи.");
                 }
                 return;
             }
@@ -59,38 +59,38 @@ public class SubtaskHandler extends BaseHttpHandler {
         }
     }
 
-    private void handleGetAllSubtasks(HttpExchange exchange) throws IOException {
-        List<Subtask> subtasks = taskManager.getAllSubtasks();
-        String response = gson.toJson(subtasks);
+    private void handleGetAllTasks(HttpExchange exchange) throws IOException {
+        List<Task> tasks = taskManager.getAllTasks();
+        String response = gson.toJson(tasks);
         sendOk(exchange, response);
     }
 
-    private void handleGetSubtaskById(HttpExchange exchange, int id) throws IOException {
-        Subtask subtask = taskManager.getSubtaskById(id);
-        if (subtask != null) {
-            String response = gson.toJson(subtask);
+    private void handleGetTaskById(HttpExchange exchange, int id) throws IOException {
+        Task task = taskManager.getTaskById(id);
+        if (task != null) {
+            String response = gson.toJson(task);
             sendOk(exchange, response);
         } else {
             sendNotFound(exchange);
         }
     }
 
-    private void handleCreateOrUpdateSubtask(HttpExchange exchange, Optional<Integer> id) throws IOException {
+    private void handleCreateOrUpdateTask(HttpExchange exchange, Optional<Integer> id) throws IOException {
         String requestBody = readText(exchange);
-        Subtask subtask = gson.fromJson(requestBody, Subtask.class);
+        Task task = gson.fromJson(requestBody, Task.class);
 
-        if (subtask == null) {
+        if (task == null) {
             sendBadRequest(exchange, "Тело запроса не может быть пустым.");
             return;
         }
 
-        id.ifPresent(subtask::setId);
+        id.ifPresent(task::setId);
 
         try {
             if (id.isPresent()) {
-                taskManager.updateSubtask(subtask);
+                taskManager.updateTask(task);
             } else {
-                taskManager.createSubtask(subtask);
+                taskManager.createTask(task);
             }
             sendCreated(exchange);
         } catch (Exception e) {
@@ -102,15 +102,15 @@ public class SubtaskHandler extends BaseHttpHandler {
         }
     }
 
-    private void handleDeleteAllSubtasks(HttpExchange exchange) throws IOException {
-        taskManager.deleteAllSubtasks();
+    private void handleDeleteAllTasks(HttpExchange exchange) throws IOException {
+        taskManager.deleteAllTasks();
         sendCreated(exchange);
     }
 
-    private void handleDeleteSubtaskById(HttpExchange exchange, int id) throws IOException {
-        Subtask subtask = taskManager.getSubtaskById(id);
-        if (subtask != null) {
-            taskManager.deleteSubtaskById(id);
+    private void handleDeleteTaskById(HttpExchange exchange, int id) throws IOException {
+        Task task = taskManager.getTaskById(id);
+        if (task != null) {
+            taskManager.deleteTaskById(id);
             sendCreated(exchange);
         } else {
             sendNotFound(exchange);

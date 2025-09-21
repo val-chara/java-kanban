@@ -1,6 +1,7 @@
 package http;
 
 import com.google.gson.Gson;
+import http.handler.BaseHttpHandler;
 import manager.InMemoryTaskManager;
 import manager.TaskManager;
 import model.Epic;
@@ -21,7 +22,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class HttpTaskManagerSubtasksTest {
+public class HttpTaskManagerSubtasksTest {
     private TaskManager manager;
     private HttpTaskServer taskServer;
     private Gson gson;
@@ -36,7 +37,7 @@ class HttpTaskManagerSubtasksTest {
     }
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         manager.deleteAllTasks();
         manager.deleteAllSubtasks();
         manager.deleteAllEpics();
@@ -48,12 +49,12 @@ class HttpTaskManagerSubtasksTest {
     }
 
     @AfterEach
-    void shutDown() {
+    public void shutDown() {
         taskServer.stop();
     }
 
     @Test
-    void testAddSubtask() throws IOException, InterruptedException {
+    public void testAddSubtask() throws IOException, InterruptedException {
         Subtask subtask = new Subtask("Test subtask", "Testing subtask", Status.NEW,
                 epic.getId(), LocalDateTime.now(), Duration.ofMinutes(30));
         String subtaskJson = gson.toJson(subtask);
@@ -73,7 +74,7 @@ class HttpTaskManagerSubtasksTest {
     }
 
     @Test
-    void testGetSubtasks() throws IOException, InterruptedException {
+    public void testGetSubtasks() throws IOException, InterruptedException {
         Subtask subtask = new Subtask("Test subtask", "Testing subtask", Status.NEW,
                 epic.getId(), LocalDateTime.now(), Duration.ofMinutes(30));
         manager.createSubtask(subtask);
@@ -90,7 +91,7 @@ class HttpTaskManagerSubtasksTest {
     }
 
     @Test
-    void testGetSubtaskByIdNotFound() throws IOException, InterruptedException {
+    public void testGetSubtaskByIdNotFound() throws IOException, InterruptedException {
         URI url = URI.create("http://localhost:8080/subtasks/999");
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
 

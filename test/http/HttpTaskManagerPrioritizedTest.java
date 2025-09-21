@@ -1,6 +1,7 @@
 package http;
 
 import com.google.gson.Gson;
+import http.handler.BaseHttpHandler;
 import manager.InMemoryTaskManager;
 import manager.TaskManager;
 import model.Task;
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class HttpTaskManagerPrioritizedTest {
+public class HttpTaskManagerPrioritizedTest {
     private TaskManager manager;
     private HttpTaskServer taskServer;
     private Gson gson;
@@ -33,7 +34,7 @@ class HttpTaskManagerPrioritizedTest {
     }
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         manager.deleteAllTasks();
         manager.deleteAllSubtasks();
         manager.deleteAllEpics();
@@ -41,12 +42,12 @@ class HttpTaskManagerPrioritizedTest {
     }
 
     @AfterEach
-    void shutDown() {
+    public void shutDown() {
         taskServer.stop();
     }
 
     @Test
-    void testGetPrioritizedTasks() throws IOException, InterruptedException {
+    public void testGetPrioritizedTasks() throws IOException, InterruptedException {
         Task task1 = new Task("Test task 1", "Testing task 1", Status.NEW,
                 LocalDateTime.now(), Duration.ofMinutes(30));
         Task task2 = new Task("Test task 2", "Testing task 2", Status.NEW,
@@ -67,7 +68,7 @@ class HttpTaskManagerPrioritizedTest {
     }
 
     @Test
-    void testGetEmptyPrioritizedTasks() throws IOException, InterruptedException {
+    public void testGetEmptyPrioritizedTasks() throws IOException, InterruptedException {
         URI url = URI.create("http://localhost:8080/prioritized");
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
 
